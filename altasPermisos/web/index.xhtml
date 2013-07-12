@@ -11,20 +11,13 @@
     <h:body>
         <h:form>
             <p:panel header="Altas Permisos" styleClass="ancho">
-                <div id="ancho">
-                    <h:graphicImage id="altasPermisos" style="float: left" onclick="dlg.show()" library="images" name="usuarios.png">
+                    <h:graphicImage id="altasPermisos" style="float: left" onclick="dlg.show();" library="images" name="usuarios.png">
                     </h:graphicImage>
-                    <p:tooltip for="altasPermisos" value="Altas Usuarios" showEffect="slide" hideEffect="slide"/>
-                    <h:graphicImage id="nuevoModulo" style="float: left" onclick="modulo.show()" library="images" name="nuevaPagina.png">
+                    <h:graphicImage id="nuevoModulo" style="float: left" onclick="modulo.show();" library="images" name="nuevaPagina.png">
                     </h:graphicImage>
-                    <p:tooltip for="nuevoModulo" value="Nuevo Modulo" showEffect="slide" hideEffect="slide"/>
-                    <h:graphicImage id="nuevoPerfil" style="float: left" onclick="modulo.show()" library="images" name="perfil.png">
-                    </h:graphicImage>
-                    <p:tooltip for="nuevoPerfil" value="Nuevo Perfil" showEffect="slide" hideEffect="slide"/>
                     <br></br>
                     <br></br>
                     <br></br>
-                </div>
                 <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
                 <p:selectOneMenu value="#{mbUsuarios.u}">
                     <f:selectItems value="#{mbUsuarios.listaDbs}"/>
@@ -36,7 +29,11 @@
                                  action="#{mbUsuarios.guardarDatos()}"
                                  ajax="false"/>
             </p:panel>
-            <p:dialog header="Altas Usuarios" widgetVar="dlg">
+
+
+        </h:form>
+        <p:dialog header="Altas Usuarios" widgetVar="dlg">
+            <h:form>
                 <br></br>
                 <h:inputText id="usuario" value="#{mbUsuarios.u.usuario}"/>
                 <p:watermark value="Usuario" for="usuario"/>
@@ -58,10 +55,9 @@
                     <p:commandButton value="Guardar"
                                      action="#{mbUsuarios.insertarDatos()}"
                                      oncomplete="dlg.hide();"
-                                    />
+                                     />
                 </center>
-            </p:dialog>
-            
-        </h:form>
+            </h:form>
+        </p:dialog>
     </h:body>
 </html>

@@ -33,8 +33,17 @@ public class MbUsuarios {
     }
     private List<SelectItem> listaDbs;
     DominioUsuarios u = new DominioUsuarios();
+    DominioUsuarios u2 = new DominioUsuarios();
     Modulo m = new Modulo();
     ArrayList<DominioUsuarios> tablaUsuarios = new ArrayList<>();
+
+    public DominioUsuarios getU2() {
+        return u2;
+    }
+
+    public void setU2(DominioUsuarios u2) {
+        this.u2 = u2;
+    }
 
     public ArrayList<DominioUsuarios> getTablaUsuarios() {
         return tablaUsuarios;
@@ -43,7 +52,6 @@ public class MbUsuarios {
     public void setTablaUsuarios(ArrayList<DominioUsuarios> tablaUsuarios) {
         this.tablaUsuarios = tablaUsuarios;
     }
-    
 
     public Modulo getM() {
         return m;
@@ -71,8 +79,8 @@ public class MbUsuarios {
     }
 
     private List<SelectItem> dameValores() throws SQLException {
-        List<SelectItem> usuarios = new ArrayList<SelectItem>();
-        ArrayList<DominioUsuarios> du = new ArrayList<>();
+        List<SelectItem> usuarios = new ArrayList<>();
+        ArrayList<DominioUsuarios> du = new ArrayList<DominioUsuarios>();
         DaoPer dp = new DaoPer();
         DominioUsuarios dominioUsuario = new DominioUsuarios();
         dominioUsuario.setUsuario("Seleccione un Usuario");
@@ -102,16 +110,22 @@ public class MbUsuarios {
         String fecha = utilerias.dameFecha();
         u.setFechaCreacion(fecha);
         daoUsuario.insertarUsuario(u);
-        eliminarObjetoUsuarios();
+        u.setUsuario("");
+        u.setLogin("");
+        u.setActualizacion("");
+        u.setEmail("");
+        u.setIdUsuario(0);
+        u.setPassword("");
+        u.setStatus(0);
     }
 
     public void eliminarObjetoUsuarios() {
-        u.setUsuario(null);
-        u.setLogin(null);
-        u.setActualizacion(null);
-        u.setEmail(null);
+        u.setUsuario("");
+        u.setLogin("");
+        u.setActualizacion("");
+        u.setEmail("");
         u.setIdUsuario(0);
-        u.setPassword(null);
+        u.setPassword("");
         u.setStatus(0);
     }
 
