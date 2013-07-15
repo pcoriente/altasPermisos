@@ -18,9 +18,26 @@ public class DominioUsuarios {
     private String password;
     private String fechaCreacion;
     private String Actualizacion;
-    private int status;
+    private int status2;
     private String email;
     private int rol;
+    private boolean status;
+
+    public int getStatus2() {
+        return status2;
+    }
+
+    public void setStatus2(int status2) {
+        this.status2 = status2;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 
     public int getIdUsuario() {
         return idUsuario;
@@ -70,14 +87,6 @@ public class DominioUsuarios {
         this.Actualizacion = Actualizacion;
     }
 
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -96,7 +105,7 @@ public class DominioUsuarios {
 
     @Override
     public String toString() {
-        return  usuario ;
+        return usuario;
     }
 
     @Override
@@ -120,9 +129,4 @@ public class DominioUsuarios {
         }
         return true;
     }
-
-   
-    
-
-   
 }

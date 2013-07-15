@@ -16,7 +16,7 @@ public class Utilerias {
     public String dameFecha() {
         String fecha = null;
         Date d = new Date();
-        SimpleDateFormat formateador = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd");
          fecha = formateador.format(d);
         return fecha;
     }

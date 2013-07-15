@@ -18,37 +18,48 @@
                     </h:graphicImage>
                     <h:graphicImage id="perfil" style="float: left" onclick="perfil.show();" library="images" name="perfil.png">
                     </h:graphicImage>
-                    <h:graphicImage id="Accion" style="float: left" onclick="Accion.show();" library="images" name="acciones.png">
+                    <h:graphicImage id="Accion" style="float: left" onclick="acciones.show();" library="images" name="acciones.png">
                     </h:graphicImage>
                     <br></br>
                     <br></br>
                     <br></br>
-                    <p:selectOneMenu id="usuarios" value="#{mbUsuarios.u}">
+                    <p:selectOneMenu  style="width: 230px;" id="usuarios" value="#{mbUsuarios.u2}">
                         <f:selectItems value="#{mbUsuarios.listaDbs}"/>
                         <f:converter converterId="usuarios"/>
                     </p:selectOneMenu>
+                    <br></br>
+                    <p:selectOneMenu id="modulos" style="width: 230px;" value="#{mbUsuarios.m2}">
+                        <f:selectItems value="#{mbUsuarios.listaModulos}"/>
+                        <f:converter converterId="traerModulos"/>
+                    </p:selectOneMenu>
+                    <br></br>
+                    <p:commandButton value="Dame"
+                                     action="#{mbUsuarios.dameValoresCmb()}"
+                                     ajax="false"/>
                 </p:panel>
-                <p:dialog header="Altas Usuarios" widgetVar="dlg">
+                <p:dialog modal="true" header="Altas Usuarios" widgetVar="dlg">
                     <br></br>
-                    <h:inputText id="usuario" value="#{mbUsuarios.u.usuario}"/>
+                    <p:inputText id="usuario" value="#{mbUsuarios.u.usuario}"/>
                     <p:watermark value="Usuario" for="usuario"/>
-                    <br></br>
-                    <h:inputText id="login" value="#{mbUsuarios.u.login}"/>
+                    <br></br> <br></br>
+                    <p:inputText id="login" value="#{mbUsuarios.u.login}"/>
                     <p:watermark value="Login" for="login"/>
-                    <br></br>
-                    <h:inputText id="password" value="#{mbUsuarios.u.password}"/>
+                    <br></br> <br></br>
+                    <p:password id="password" value="#{mbUsuarios.u.password}"/>
                     <p:watermark value="Password" for="password"/>
-                    <br></br>
-                    <h:inputText id="correo" value="#{mbUsuarios.u.email}"/>
+                    <br></br> <br></br>
+                    <p:inputText id="correo"  value="#{mbUsuarios.u.email}"/>
                     <p:watermark value="Correo" for="correo"/>
-                    <br></br>
+                    <br></br> <br></br>
                     <h:panelGrid columns="2">
-                        <h:outputText value="Status"></h:outputText><p:selectBooleanCheckbox >  
+                        <h:outputText value="Status"></h:outputText>
+                        <p:selectBooleanCheckbox value="#{mbUsuarios.s}">  
                         </p:selectBooleanCheckbox>
                     </h:panelGrid>
                     <center>
                         <p:commandButton 
                             value="Guardar"
+                            icon="ui-icon-disk"
                             action="#{mbUsuarios.insertarDatos()}"
                             update="usuarios"
                             oncomplete="dlg.hide();"
@@ -57,15 +68,38 @@
                 </p:dialog>
                 <p:dialog  modal="true" header="Altas Usuarios" widgetVar="modulo" >
                     <br></br>
-                    <h:inputText id="Modulo" value="#{mbUsuarios.m.modulo}"/>
+                    <p:inputText id="Modulo" value="#{mbUsuarios.m.modulo}"/>
                     <p:watermark value="Modulo" for="Modulo"/>
                     <center>
                         <p:commandButton 
+                            icon="ui-icon-disk"
                             value="Guardar"
                             action="#{mbUsuarios.guardarModulo()}"
+                            update="modulos"
                             oncomplete="modulo.hide();"
                             />
                     </center>
+                </p:dialog>
+                <p:dialog  modal="true" header="Acciones" widgetVar="acciones" >
+                    <p:inputText id="nombrePerfil"/>
+                    <p:watermark for="nombrePerfil" value="Perfil"/>
+                    <h:panelGrid style="width: 150px" columns="2">
+                        <h:outputText value="Altas"></h:outputText><p:selectBooleanCheckbox value="#{mbUsuarios.s}">  
+                        </p:selectBooleanCheckbox>
+                    </h:panelGrid>
+                    <h:panelGrid style="width: 133px" columns="2">
+                        <h:outputText value="Eliminar"></h:outputText><p:selectBooleanCheckbox value="#{mbUsuarios.s}">  
+                        </p:selectBooleanCheckbox>
+                    </h:panelGrid>
+                    <h:panelGrid  style="width: 130px" columns="2">
+                        <h:outputText value="Actualizar"></h:outputText><p:selectBooleanCheckbox value="#{mbUsuarios.s}">  
+                        </p:selectBooleanCheckbox>
+                    </h:panelGrid>
+                    <h:panelGrid style="width: 130px" columns="2">
+                        <h:outputText value="Consultar"></h:outputText><p:selectBooleanCheckbox value="#{mbUsuarios.s}">  
+                        </p:selectBooleanCheckbox>
+                    </h:panelGrid>
+                    <p:commandButton   value="Guardar" icon="ui-icon-disk"/>
                 </p:dialog>
             </div>
         </h:form>

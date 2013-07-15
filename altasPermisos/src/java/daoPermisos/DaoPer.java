@@ -59,8 +59,8 @@ public class DaoPer {
         PreparedStatement ps = cn.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
-            dU.setUsuario(rs.getString("usuario"));
             dU.setIdUsuario(rs.getInt("idUsuario"));
+            dU.setUsuario(rs.getString("usuario"));
             dU.setPassword(rs.getString("password"));
         }
         cn.close();
@@ -75,7 +75,7 @@ public class DaoPer {
         ps.setString(2, u.getLogin());
         ps.setString(3, u.getPassword());
         ps.setString(4, u.getFechaCreacion());
-        ps.setInt(5, u.getStatus());
+        ps.setInt(5, u.getStatus2());
         ps.setString(6, u.getEmail());
         ps.setInt(7, u.getRol());
         try {
@@ -100,5 +100,46 @@ public class DaoPer {
         } finally {
             cn.close();
         }
+    }
+
+    public ArrayList<Modulo> dameModulos() throws SQLException {
+        ArrayList<Modulo> modulos = new ArrayList<>();
+        String sqlModulos = "SELECT * FROM modulos";
+        Connection cn = ds.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sqlModulos);
+        try {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Modulo modulo = new Modulo();
+                modulo.setIdModulo(rs.getInt("idModulo"));
+                modulo.setModulo(rs.getString("modulo"));
+                modulos.add(modulo);
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+
+        return modulos;
+    }
+
+    public Modulo dameModulo(int idModulo) throws SQLException {
+        Connection cn = ds.getConnection();
+        Modulo m = new Modulo();
+        String sql = "SELECT * FROM modulos WHERE idModulo = " + idModulo;
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                m.setIdModulo(rs.getInt("idModulo"));
+                m.setModulo(rs.getString("modulo"));
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+        return m;
     }
 }

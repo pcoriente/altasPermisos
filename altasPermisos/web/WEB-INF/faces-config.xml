@@ -10,5 +10,9 @@
         <converter-id>usuarios</converter-id>
         <converter-class>converterPermisos.ConverterUsuarios</converter-class>
     </converter>
-
+    
+    <converter>
+        <converter-id>traerModulos</converter-id>
+        <converter-class>converterPermisos.ConverterModulos</converter-class>
+    </converter>
 </faces-config>

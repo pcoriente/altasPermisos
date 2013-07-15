@@ -28,4 +28,31 @@ public class Modulo {
     public void setModulo(String modulo) {
         this.modulo = modulo;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + this.idModulo;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Modulo other = (Modulo) obj;
+        if (this.idModulo != other.idModulo) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return modulo;
+    }
 }

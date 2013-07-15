@@ -32,10 +32,38 @@ public class MbUsuarios {
     public MbUsuarios() {
     }
     private List<SelectItem> listaDbs;
+    private List<SelectItem> listaModulos;
     DominioUsuarios u = new DominioUsuarios();
     DominioUsuarios u2 = new DominioUsuarios();
     Modulo m = new Modulo();
+    Modulo m2 = new Modulo();
     ArrayList<DominioUsuarios> tablaUsuarios = new ArrayList<>();
+    private boolean s;
+
+    public boolean isS() {
+        return s;
+    }
+
+    public void setS(boolean s) {
+        this.s = s;
+    }
+
+    public Modulo getM2() {
+        return m2;
+    }
+
+    public void setM2(Modulo m2) {
+        this.m2 = m2;
+    }
+
+    public List<SelectItem> getListaModulos() throws SQLException {
+        listaModulos = dameModulos();
+        return listaModulos;
+    }
+
+    public void setListaModulos(List<SelectItem> listaModulos) {
+        this.listaModulos = listaModulos;
+    }
 
     public DominioUsuarios getU2() {
         return u2;
@@ -84,7 +112,7 @@ public class MbUsuarios {
         DaoPer dp = new DaoPer();
         DominioUsuarios dominioUsuario = new DominioUsuarios();
         dominioUsuario.setUsuario("Seleccione un Usuario");
-        dominioUsuario.setPassword("0");
+        dominioUsuario.setIdUsuario(0);
         SelectItem Si = new SelectItem(dominioUsuario, dominioUsuario.getUsuario());
         usuarios.add(Si);
         du = dp.dameUsuarios();
@@ -105,32 +133,44 @@ public class MbUsuarios {
     }
 
     public void insertarDatos() throws SQLException {
+        if (s == true) {
+            u.setStatus2(1);
+        } else {
+            u.setStatus2(0);
+        }
         DaoPer daoUsuario = new DaoPer();
         Utilerias utilerias = new Utilerias();
         String fecha = utilerias.dameFecha();
         u.setFechaCreacion(fecha);
         daoUsuario.insertarUsuario(u);
-        u.setUsuario("");
-        u.setLogin("");
-        u.setActualizacion("");
-        u.setEmail("");
-        u.setIdUsuario(0);
-        u.setPassword("");
-        u.setStatus(0);
-    }
-
-    public void eliminarObjetoUsuarios() {
-        u.setUsuario("");
-        u.setLogin("");
-        u.setActualizacion("");
-        u.setEmail("");
-        u.setIdUsuario(0);
-        u.setPassword("");
-        u.setStatus(0);
+        u = new DominioUsuarios();
+        u.setUsuario(null);
     }
 
     public void guardarModulo() throws SQLException {
         DaoPer daoPer = new DaoPer();
         daoPer.guardarModulo(m);
+    }
+
+    private List<SelectItem> dameModulos() throws SQLException {
+        List<SelectItem> Modulos = new ArrayList<>();
+        ArrayList<Modulo> modul = new ArrayList<Modulo>();
+        DaoPer dp = new DaoPer();
+        Modulo modulo = new Modulo();
+        modulo.setModulo("Seleccione un Modulo");
+        modulo.setIdModulo(0);
+        SelectItem itemModulo = new SelectItem(modulo, modulo.getModulo());
+        Modulos.add(itemModulo);
+        modul = dp.dameModulos();
+        for (Modulo d : modul) {
+            Modulos.add(new SelectItem(d, d.getModulo()));
+        }
+        return Modulos;
+    }
+
+    public void dameValoresCmb() {
+
+        m2.getModulo();
+        System.err.println("El modulo es= " + m2.getModulo() + u2.getUsuario());
     }
 }
