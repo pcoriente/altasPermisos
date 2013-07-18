@@ -15,4 +15,10 @@
         <converter-id>traerModulos</converter-id>
         <converter-class>converterPermisos.ConverterModulos</converter-class>
     </converter>
+
+    <converter>
+        <converter-id>traerBd</converter-id>
+        <converter-class>converterPermisos.ConverterBd</converter-class>
+    </converter>
+
 </faces-config>

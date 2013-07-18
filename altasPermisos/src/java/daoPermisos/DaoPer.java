@@ -4,8 +4,12 @@
  */
 package daoPermisos;
 
+import dominios.Acciones;
+import dominios.BaseDatos;
 import dominios.DominioUsuarios;
 import dominios.Modulo;
+import dominios.Perfiles;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,7 +33,7 @@ public class DaoPer {
     public DaoPer() {
         try {
             Context cI = new InitialContext();
-            ds = (DataSource) cI.lookup("java:comp/env/jdbc/__anitaNuevo");
+            ds = (DataSource) cI.lookup("java:comp/env/jdbc/__systemWeb");
         } catch (NamingException ex) {
             Logger.getLogger(DaoPer.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -37,7 +41,7 @@ public class DaoPer {
 
     public ArrayList<DominioUsuarios> dameUsuarios() throws SQLException {
         ArrayList<DominioUsuarios> usuarios = new ArrayList<>();
-        String sql = "SELECT * FROM usuarios";
+        String sql = "SELECT * FROM usuario";
         Connection cn = ds.getConnection();
         PreparedStatement ps = cn.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
@@ -141,5 +145,82 @@ public class DaoPer {
             cn.close();
         }
         return m;
+    }
+
+    public ArrayList<BaseDatos> dameBaseDatos() throws SQLException {
+        String sql = "SELECT * FROM basesDeDatos";
+        ArrayList<BaseDatos> listBd = new ArrayList<BaseDatos>();
+        Connection cn = ds.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                BaseDatos bd = new BaseDatos();
+                bd.setIdBaseDatos(rs.getInt("idBaseDeDatos"));
+                bd.setBaseDatos(rs.getString("baseDeDatos"));
+                bd.setJndi(rs.getString("jndi"));
+                listBd.add(bd);
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+
+        return listBd;
+    }
+
+    public void insertarAcciones(Acciones acciones) throws SQLException {
+        Connection cn = ds.getConnection();
+        String sql = "INSERT INTO acciones (accion, status, idBoton, idModulo) VALUES(?,?,?,?)";
+        PreparedStatement ps = cn.prepareStatement(sql);
+        ps.setString(1, acciones.getAccion());
+        ps.setInt(2, acciones.getStatus());
+        ps.setString(3, acciones.getIdBoton());
+        ps.setInt(4, acciones.getIdMOdulo());
+        try {
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+    }
+
+    public void insertarPerfil(Perfiles perfil) throws SQLException {
+        Connection cn = ds.getConnection();
+        String sql = "INSERT INTO perfiles VALUES (?)";
+        PreparedStatement ps = cn.prepareStatement(sql);
+        ps.setString(1, perfil.getPerfil());
+        try {
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+    }
+
+    public BaseDatos dameBaseDatos(int idBaseDatos) throws SQLException {
+        String sql = "SELECT * FROM basesDeDatos WHERE idBaseDeDatos=" + idBaseDatos;
+        BaseDatos b = new BaseDatos();
+        Connection cn = ds.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try{
+             ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            b.setBaseDatos(rs.getString("baseDeDatos"));
+            b.setJndi(rs.getString("jndi"));
+        }
+        }
+        catch (Exception e ){
+            System.err.println(e);
+        }
+        finally{
+            cn.close();
+        }
+        return b;
     }
 }

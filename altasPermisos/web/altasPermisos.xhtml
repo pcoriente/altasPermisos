@@ -33,9 +33,16 @@
                         <f:converter converterId="traerModulos"/>
                     </p:selectOneMenu>
                     <br></br>
-                  
+                    <p:selectOneMenu id="perfiles" style="width: 230px" value="#{mbUsuarios.bd}">
+                        <f:selectItems value="#{mbUsuarios.listaBaseDatos}"/>
+                        <f:converter converterId="traerBd"/>
+                    </p:selectOneMenu>
+                    <br></br>
+                    <p:selectOneMenu>
+                        <f:selectItems />
+                    </p:selectOneMenu>
                     <p:commandButton id="dame"
-                            value="Dame"
+                                     value="Dame"
                                      action="#{mbUsuarios.dameValoresCmb()}"
                                      ajax="false"/>
                 </p:panel>
@@ -82,27 +89,36 @@
                             />
                     </center>
                 </p:dialog>
-                <p:dialog  modal="true" header="Acciones" widgetVar="acciones" >
-                    <p:inputText id="nombrePerfil"/>
-                    <p:watermark for="nombrePerfil" value="Perfil"/>
-                    <h:panelGrid style="width: 150px" columns="2">
-                        <h:outputText value="Altas"></h:outputText><p:selectBooleanCheckbox value="#{mbUsuarios.s}">  
-                        </p:selectBooleanCheckbox>
-                    </h:panelGrid>
-                    <h:panelGrid style="width: 133px" columns="2">
-                        <h:outputText value="Eliminar"></h:outputText><p:selectBooleanCheckbox value="#{mbUsuarios.s}">  
-                        </p:selectBooleanCheckbox>
-                    </h:panelGrid>
-                    <h:panelGrid  style="width: 130px" columns="2">
-                        <h:outputText value="Actualizar"></h:outputText><p:selectBooleanCheckbox value="#{mbUsuarios.s}">  
-                        </p:selectBooleanCheckbox>
-                    </h:panelGrid>
-                    <h:panelGrid style="width: 130px" columns="2">
-                        <h:outputText value="Consultar"></h:outputText><p:selectBooleanCheckbox value="#{mbUsuarios.s}">  
-                        </p:selectBooleanCheckbox>
-                    </h:panelGrid>
-                    <p:commandButton   value="Guardar" icon="ui-icon-disk"/>
+                <p:dialog  modal="true" header="Perfiles" widgetVar="perfil" >
+                    <p:inputText id="nombrePerfil" value="#{mbUsuarios.perfil.perfil}"/>
+                    <p:watermark for="nombrePerfil" value="Nombre Perfil"/>
+                    <p:commandButton value="Guardar" 
+                                     action="#{mbUsuarios.guardarPerfil()}"/>
                 </p:dialog>
+                <p:dialog  modal="true" header="Acciones" widgetVar="acciones" >
+                    <p:inputText id="accion" value="#{mbUsuarios.acciones.accion}" />
+                    <p:watermark for="accion" value="Accion"/>
+                    <br></br><br></br>
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Status"/>
+                        <p:selectBooleanCheckbox value="#{mbUsuarios.acciones.sta}">  
+                        </p:selectBooleanCheckbox>
+                    </h:panelGrid>
+                    <br></br>
+                    <p:inputText id="idBoton" value="#{mbUsuarios.acciones.idBoton}"/>
+                    <p:watermark for="idBoton" value="Nombre IdBtn"/>
+                    <br></br><br></br>
+                    <p:selectOneMenu  style="width: 210px;" value="#{mbUsuarios.m2}">
+                        <f:selectItems value="#{mbUsuarios.listaModulos}"/>
+                        <f:converter converterId="traerModulos"/>
+                    </p:selectOneMenu>
+                    <br></br><br></br>
+                    <p:commandButton   value="Guardar" 
+                                       icon="ui-icon-disk"
+                                       action="#{mbUsuarios.guardarAcciones()}"
+                                       oncomplete="Accion.hide();"/>
+                </p:dialog>
+
             </div>
         </h:form>
     </h:body>

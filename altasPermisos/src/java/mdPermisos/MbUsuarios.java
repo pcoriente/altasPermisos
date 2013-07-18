@@ -5,11 +5,16 @@
 package mdPermisos;
 
 import daoPermisos.DaoPer;
+import dominios.Acciones;
+import dominios.BaseDatos;
 import dominios.DominioUsuarios;
 import dominios.Modulo;
+import dominios.Perfiles;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
@@ -31,14 +36,74 @@ public class MbUsuarios {
      */
     public MbUsuarios() {
     }
-    private List<SelectItem> listaDbs;
+    private List<SelectItem> listaUsuarios;
+    private List<SelectItem> listaPerfiles;
     private List<SelectItem> listaModulos;
+    private List<SelectItem> listaBaseDatos;
     DominioUsuarios u = new DominioUsuarios();
     DominioUsuarios u2 = new DominioUsuarios();
     Modulo m = new Modulo();
     Modulo m2 = new Modulo();
+    BaseDatos bd = new BaseDatos();
     ArrayList<DominioUsuarios> tablaUsuarios = new ArrayList<>();
     private boolean s;
+    Acciones acciones = new Acciones();
+    Perfiles perfil = new Perfiles();
+
+    public BaseDatos getBd() {
+        return bd;
+    }
+
+    public void setBd(BaseDatos bd) {
+        this.bd = bd;
+    }
+
+    public Perfiles getPerfil() {
+        return perfil;
+    }
+
+    public void setPerfil(Perfiles perfil) {
+        this.perfil = perfil;
+    }
+
+    public Acciones getAcciones() {
+        return acciones;
+    }
+
+    public void setAcciones(Acciones acciones) {
+        this.acciones = acciones;
+    }
+
+    public List<SelectItem> getListaUsuarios() {
+        return listaUsuarios;
+    }
+
+    public void setListaUsuarios(List<SelectItem> listaUsuarios) {
+        this.listaUsuarios = listaUsuarios;
+    }
+
+    public List<SelectItem> getListaBaseDatos() {
+        try {
+            listaBaseDatos = dameBd();
+        } catch (SQLException ex) {
+            Logger.getLogger(MbUsuarios.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return listaBaseDatos;
+    }
+
+    public void setListaBaseDatos(List<SelectItem> listaBaseDatos) {
+        this.listaBaseDatos = listaBaseDatos;
+    }
+
+    public List<SelectItem> getListaPerfiles() {
+//        listaPerfiles = damePerfiles();
+//        terminar
+        return listaPerfiles;
+    }
+
+    public void setListaPerfiles(List<SelectItem> listaPerfiles) {
+        this.listaPerfiles = listaPerfiles;
+    }
 
     public boolean isS() {
         return s;
@@ -98,12 +163,12 @@ public class MbUsuarios {
     }
 
     public List<SelectItem> getListaDbs() throws SQLException {
-        listaDbs = dameValores();
-        return listaDbs;
+        listaUsuarios = dameValores();
+        return listaUsuarios;
     }
 
     public void setListaDbs(List<SelectItem> listaDbs) {
-        this.listaDbs = listaDbs;
+        this.listaUsuarios = listaDbs;
     }
 
     private List<SelectItem> dameValores() throws SQLException {
@@ -172,5 +237,42 @@ public class MbUsuarios {
 
         m2.getModulo();
         System.err.println("El modulo es= " + m2.getModulo() + u2.getUsuario());
+        bd.getBaseDatos();
     }
+
+    public void guardarAcciones() throws SQLException {
+        if (acciones.isSta() == true) {
+            acciones.setStatus(1);
+        } else {
+            acciones.setStatus(0);
+        }
+        acciones.getAccion();
+        acciones.getIdBoton();
+        acciones.setIdMOdulo(m2.getIdModulo());
+        DaoPer daoPermisos = new DaoPer();
+        daoPermisos.insertarAcciones(acciones);
+    }
+
+    private List<SelectItem> dameBd() throws SQLException {
+        List<SelectItem> Bds = new ArrayList<>();
+        ArrayList<BaseDatos> bds = new ArrayList<BaseDatos>();
+        DaoPer dp = new DaoPer();
+        BaseDatos baseDatos = new BaseDatos();
+        baseDatos.setBaseDatos("Seleccione BD");
+        baseDatos.setIdBaseDatos(0);
+        SelectItem itemModulo = new SelectItem(baseDatos, baseDatos.getBaseDatos());
+        Bds.add(itemModulo);
+        bds = dp.dameBaseDatos();
+        for (BaseDatos bd : bds) {
+            Bds.add(new SelectItem(bd, bd.getBaseDatos()));
+        }
+        return Bds;
+    }
+
+    public void guardarPerfil() throws SQLException {
+        DaoPer daoPer = new DaoPer();
+        daoPer.insertarPerfil(perfil);
+    }
+
+   
 }
