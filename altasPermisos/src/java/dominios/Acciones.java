@@ -68,4 +68,31 @@ public class Acciones {
     public void setIdMOdulo(int idMOdulo) {
         this.idMOdulo = idMOdulo;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + this.idAccion;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Acciones other = (Acciones) obj;
+        if (this.idAccion != other.idAccion) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return accion;
+    }
 }

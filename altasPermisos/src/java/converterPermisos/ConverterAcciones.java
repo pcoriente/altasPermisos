@@ -5,7 +5,7 @@
 package converterPermisos;
 
 import daoPermisos.DaoPer;
-import dominios.BaseDatos;
+import dominios.Acciones;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,27 +17,27 @@ import javax.faces.convert.Converter;
  *
  * @author Comodoro
  */
-public class ConverterBd implements Converter {
+public class ConverterAcciones implements Converter {
 
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
-        int idBaseDatos = Integer.parseInt(value);
-        BaseDatos bd = new BaseDatos();
+        int idAccion;
+        idAccion= Integer.parseInt(value);
+        Acciones acciones = new Acciones();
         DaoPer daoPermisos = new DaoPer();
         try {
-            bd = daoPermisos.dameBaseDatos(idBaseDatos);
+            acciones = daoPermisos.dameAcciones(idAccion);
         } catch (SQLException ex) {
-            Logger.getLogger(ConverterBd.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ConverterAcciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return bd;
+        return acciones;
     }
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        String idBaseDatos;
-        BaseDatos b = (BaseDatos) value;
-
-        idBaseDatos = Integer.toString(b.getIdBaseDatos());
-        return idBaseDatos;
+        String idAcciones;
+        Acciones acciones = (Acciones) value;
+        idAcciones = Integer.toString(acciones.getIdAccion());
+        return idAcciones;
     }
 }

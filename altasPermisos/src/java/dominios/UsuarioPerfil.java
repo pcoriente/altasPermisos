@@ -8,18 +8,18 @@ package dominios;
  *
  * @author Comodoro
  */
-public class PerfilesDetalle {
+public class UsuarioPerfil {
 
     private int idPerfil;
+    private int idModulo;
     private int idAccion;
-    private int idUsuario;
 
-    public int getIdUsuario() {
-        return idUsuario;
+    public int getIdAccion() {
+        return idAccion;
     }
 
-    public void setIdUsuario(int idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setIdAccion(int idAccion) {
+        this.idAccion = idAccion;
     }
 
     public int getIdPerfil() {
@@ -30,11 +30,11 @@ public class PerfilesDetalle {
         this.idPerfil = idPerfil;
     }
 
-    public int getIdAccion() {
-        return idAccion;
+    public int getIdModulo() {
+        return idModulo;
     }
 
-    public void setIdAccion(int idAccion) {
-        this.idAccion = idAccion;
+    public void setIdModulo(int idModulo) {
+        this.idModulo = idModulo;
     }
 }

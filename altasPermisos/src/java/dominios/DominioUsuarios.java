@@ -4,7 +4,6 @@
  */
 package dominios;
 
-
 /**
  *
  * @author Comodoro
@@ -21,6 +20,24 @@ public class DominioUsuarios {
     private String email;
     private int rol;
     private boolean status;
+    private int idPerfil;
+    private String perfil;
+
+    public String getPerfil() {
+        return perfil;
+    }
+
+    public void setPerfil(String perfil) {
+        this.perfil = perfil;
+    }
+
+    public int getIdPerfil() {
+        return idPerfil;
+    }
+
+    public void setIdPerfil(int idPerfil) {
+        this.idPerfil = idPerfil;
+    }
 
     public int getStatus2() {
         return status2;

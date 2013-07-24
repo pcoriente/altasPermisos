@@ -10,54 +10,40 @@
     </h:head>
     <h:body>
         <h:form>
-            <p:panel header="Altas Permisos" styleClass="ancho">
-                    <h:graphicImage id="altasPermisos" style="float: left" onclick="dlg.show();" library="images" name="usuarios.png">
-                    </h:graphicImage>
-                    <h:graphicImage id="nuevoModulo" style="float: left" onclick="modulo.show();" library="images" name="nuevaPagina.png">
-                    </h:graphicImage>
-                    <br></br>
-                    <br></br>
-                    <br></br>
-                <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
-                <p:selectOneMenu value="#{mbUsuarios.u}">
-                    <f:selectItems value="#{mbUsuarios.listaDbs}"/>
-                    <f:converter converterId="usuarios"/>
-                </p:selectOneMenu>
-                <br></br>
-                <br></br>
-                <p:commandButton value="DameValores" 
-                                 action="#{mbUsuarios.guardarDatos()}"
-                                 ajax="false"/>
-            </p:panel>
-
-
+            <p:selectOneMenu id="listaBd" style="width: 230px" 
+                             value="#{mbUsuarios.bd}">
+                <f:selectItems value="#{mbUsuarios.listaBaseDatos}"/>
+                <f:converter converterId="traerBd"/>
+                <p:ajax  update="listaPerfiles"/>
+            </p:selectOneMenu>
+            <p:outputLabel> Perfiles.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
+            <p:selectOneMenu  
+                disabled="#{mbUsuarios.bd==null || mbUsuarios.bd.idBaseDatos==0}"
+                id="listaPerfiles" style="width: 230px"
+                value="#{mbUsuarios.perfil2}">
+                <f:selectItems value="#{mbUsuarios.listaPerfiles}" />
+                <f:converter converterId="traerPerfil"/>
+                <p:ajax event="change" 
+                        listener="#{mbUsuarios.dameValoresCmb()}" 
+                        update="modulos"
+                        process="@this"/>
+            </p:selectOneMenu>
+            <h:graphicImage id="perfil" style="float: left" onclick="perfil.show();" library="images" name="perfil.png">
+            </h:graphicImage>
+            <p:outputLabel>Modulo.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
+            <p:selectOneMenu 
+                id="modulos" 
+                disabled="#{mbUsuarios.perfil2.perfil==null}"
+                style="width: 230px"
+                value="#{mbUsuarios.modulo}">
+                <f:selectItems value="#{mbUsuarios.listaModulos}"/>
+                <f:converter converterId="traerModulos"/>
+                <p:ajax listener="#{mbUsuarios.dameModulosAcciones()}"
+                        event="change" 
+                        process="@this"/>
+            </p:selectOneMenu>
+            <h:graphicImage id="nuevoModulo" style="float: left" onclick="modulo.show();" library="images" name="nuevaPagina.png">
+            </h:graphicImage>
         </h:form>
-        <p:dialog header="Altas Usuarios" widgetVar="dlg">
-            <h:form>
-                <br></br>
-                <h:inputText id="usuario" value="#{mbUsuarios.u.usuario}"/>
-                <p:watermark value="Usuario" for="usuario"/>
-                <br></br>
-                <h:inputText id="login" value="#{mbUsuarios.u.login}"/>
-                <p:watermark value="Login" for="login"/>
-                <br></br>
-                <h:inputText id="password" value="#{mbUsuarios.u.password}"/>
-                <p:watermark value="Password" for="password"/>
-                <br></br>
-                <h:inputText id="correo" value="#{mbUsuarios.u.email}"/>
-                <p:watermark value="Correo" for="correo"/>
-                <br></br>
-                <h:panelGrid columns="2">
-                    <h:outputText value="Status"></h:outputText><p:selectBooleanCheckbox >  
-                    </p:selectBooleanCheckbox>
-                </h:panelGrid>
-                <center>
-                    <p:commandButton value="Guardar"
-                                     action="#{mbUsuarios.insertarDatos()}"
-                                     oncomplete="dlg.hide();"
-                                     />
-                </center>
-            </h:form>
-        </p:dialog>
     </h:body>
 </html>

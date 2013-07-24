@@ -12,39 +12,69 @@
             <div style="width: 950px; margin: auto">
                 <h:graphicImage  library="images" name="encabezado.jpg" /> 
                 <p:panel header="Altas" >
+                    <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
+                    <h:graphicImage id="perfil" style="float: left" onclick="perfil.show();" library="images" name="perfil.png">
+                    </h:graphicImage>
                     <h:graphicImage id="altasPermisos" style="float: left" onclick="dlg.show();" library="images" name="usuarios.png">
                     </h:graphicImage>
                     <h:graphicImage id="nuevoModulo" style="float: left" onclick="modulo.show();" library="images" name="nuevaPagina.png">
-                    </h:graphicImage>
-                    <h:graphicImage id="perfil" style="float: left" onclick="perfil.show();" library="images" name="perfil.png">
                     </h:graphicImage>
                     <h:graphicImage id="Accion" style="float: left" onclick="acciones.show();" library="images" name="acciones.png">
                     </h:graphicImage>
                     <br></br>
                     <br></br>
                     <br></br>
-                    <p:selectOneMenu  style="width: 230px;" id="usuarios" value="#{mbUsuarios.u2}">
-                        <f:selectItems value="#{mbUsuarios.listaDbs}"/>
-                        <f:converter converterId="usuarios"/>
-                    </p:selectOneMenu>
-                    <br></br>
-                    <p:selectOneMenu id="modulos" style="width: 230px;" value="#{mbUsuarios.m2}">
-                        <f:selectItems value="#{mbUsuarios.listaModulos}"/>
-                        <f:converter converterId="traerModulos"/>
-                    </p:selectOneMenu>
-                    <br></br>
-                    <p:selectOneMenu id="perfiles" style="width: 230px" value="#{mbUsuarios.bd}">
+                    <p:outputLabel>Base de Datos.</p:outputLabel>
+                    <p:selectOneMenu id="listaBd" style="width: 230px" 
+                                     value="#{mbUsuarios.bd}">
                         <f:selectItems value="#{mbUsuarios.listaBaseDatos}"/>
                         <f:converter converterId="traerBd"/>
                     </p:selectOneMenu>
-                    <br></br>
-                    <p:selectOneMenu>
-                        <f:selectItems />
-                    </p:selectOneMenu>
-                    <p:commandButton id="dame"
-                                     value="Dame"
-                                     action="#{mbUsuarios.dameValoresCmb()}"
-                                     ajax="false"/>
+                    <h:panelGrid columns="2">
+                        <p:outputLabel> Perfiles.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
+                        <p:selectOneMenu  
+                            id="listaPerfiles" style="width: 230px"
+                            value="#{mbUsuarios.perfil2}">
+                            <f:selectItems value="#{mbUsuarios.listaPerfiles}" />
+                            <f:converter converterId="traerPerfil"/>
+                        </p:selectOneMenu>
+
+                        <p:outputLabel>Modulo.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
+                        <p:selectOneMenu 
+                            id="modulos" 
+                            style="width: 230px"
+                            value="#{mbUsuarios.modulo}">
+                            <f:selectItems value="#{mbUsuarios.listaModulos}"/>
+                            <f:converter converterId="traerModulos"/>
+                            <p:ajax listener="#{mbUsuarios.dameModulosAcciones()}"
+                                    event="change" 
+                                    update="PickAcciones"
+                                    process="@this"/>
+                        </p:selectOneMenu>
+
+                    </h:panelGrid>
+                    <p:pickList  style="width: 200px"
+                                 id="PickAcciones"
+                                 effect="slide"
+                                 value="#{mbUsuarios.pickAcciones}"
+                                 var="ListaModulos"
+                                 itemLabel="#{ListaModulos}"
+                                 itemValue="#{ListaModulos}">
+                        <f:converter converterId="traerAcciones"/>
+                    </p:pickList>
+                    <p:commandButton 
+                        value="Guardar"
+                        action="#{mbUsuarios.dameValoresCmb()}"
+                        icon="ui-icon-disk"
+                        />
+                    <p:dataTable>
+                        <p:column headerText="Modulos">
+
+                        </p:column>
+                        <p:column headerText="Modificaion">
+
+                        </p:column>
+                    </p:dataTable>
                 </p:panel>
                 <p:dialog modal="true" header="Altas Usuarios" widgetVar="dlg">
                     <br></br>
@@ -56,6 +86,11 @@
                     <br></br> <br></br>
                     <p:password id="password" value="#{mbUsuarios.u.password}"/>
                     <p:watermark value="Password" for="password"/>
+                    <br></br> <br></br>
+                    <p:selectOneMenu  value="#{mbUsuarios.perfil}" id="listaPerfiles2" style="width: 210px">
+                        <f:selectItems value="#{mbUsuarios.listaPerfiles}"/>
+                        <f:converter converterId="traerPerfil"/>
+                    </p:selectOneMenu>
                     <br></br> <br></br>
                     <p:inputText id="correo"  value="#{mbUsuarios.u.email}"/>
                     <p:watermark value="Correo" for="correo"/>
@@ -70,12 +105,12 @@
                             value="Guardar"
                             icon="ui-icon-disk"
                             action="#{mbUsuarios.insertarDatos()}"
-                            update="usuarios"
                             oncomplete="dlg.hide();"
+                            update="usuario login password correo"
                             />
                     </center>
                 </p:dialog>
-                <p:dialog  modal="true" header="Altas Usuarios" widgetVar="modulo" >
+                <p:dialog  modal="true" header="Altas Modulos" widgetVar="modulo" >
                     <br></br>
                     <p:inputText id="Modulo" value="#{mbUsuarios.m.modulo}"/>
                     <p:watermark value="Modulo" for="Modulo"/>
@@ -84,7 +119,7 @@
                             icon="ui-icon-disk"
                             value="Guardar"
                             action="#{mbUsuarios.guardarModulo()}"
-                            update="modulos"
+                            update="modulos2 modulos"
                             oncomplete="modulo.hide();"
                             />
                     </center>
@@ -93,22 +128,19 @@
                     <p:inputText id="nombrePerfil" value="#{mbUsuarios.perfil.perfil}"/>
                     <p:watermark for="nombrePerfil" value="Nombre Perfil"/>
                     <p:commandButton value="Guardar" 
-                                     action="#{mbUsuarios.guardarPerfil()}"/>
+                                     action="#{mbUsuarios.guardarPerfil()}"
+                                     update="listaPerfiles listaPerfiles2"
+                                     oncomplete="perfil.hide();"/>
                 </p:dialog>
                 <p:dialog  modal="true" header="Acciones" widgetVar="acciones" >
                     <p:inputText id="accion" value="#{mbUsuarios.acciones.accion}" />
                     <p:watermark for="accion" value="Accion"/>
-                    <br></br><br></br>
-                    <h:panelGrid columns="2">
-                        <h:outputText value="Status"/>
-                        <p:selectBooleanCheckbox value="#{mbUsuarios.acciones.sta}">  
-                        </p:selectBooleanCheckbox>
-                    </h:panelGrid>
+                    <br></br>
                     <br></br>
                     <p:inputText id="idBoton" value="#{mbUsuarios.acciones.idBoton}"/>
                     <p:watermark for="idBoton" value="Nombre IdBtn"/>
                     <br></br><br></br>
-                    <p:selectOneMenu  style="width: 210px;" value="#{mbUsuarios.m2}">
+                    <p:selectOneMenu  id="modulos2" style="width: 210px;" value="#{mbUsuarios.m3}">
                         <f:selectItems value="#{mbUsuarios.listaModulos}"/>
                         <f:converter converterId="traerModulos"/>
                     </p:selectOneMenu>
@@ -116,9 +148,9 @@
                     <p:commandButton   value="Guardar" 
                                        icon="ui-icon-disk"
                                        action="#{mbUsuarios.guardarAcciones()}"
-                                       oncomplete="Accion.hide();"/>
+                                       update="accion  idBoton modulos2"
+                                       oncomplete="acciones.hide();"/>
                 </p:dialog>
-
             </div>
         </h:form>
     </h:body>

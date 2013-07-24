@@ -9,6 +9,7 @@ import dominios.BaseDatos;
 import dominios.DominioUsuarios;
 import dominios.Modulo;
 import dominios.Perfiles;
+import dominios.UsuarioPerfil;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,6 +22,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import utilerias.Utilerias;
 
 /**
  *
@@ -39,9 +41,18 @@ public class DaoPer {
         }
     }
 
+    public DaoPer(String jndi) {
+        try {
+            Context cI = new InitialContext();
+            ds = (DataSource) cI.lookup("java:comp/env/" + jndi);
+        } catch (NamingException ex) {
+            Logger.getLogger(DaoPer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public ArrayList<DominioUsuarios> dameUsuarios() throws SQLException {
         ArrayList<DominioUsuarios> usuarios = new ArrayList<>();
-        String sql = "SELECT * FROM usuario";
+        String sql = "SELECT * FROM usuarios";
         Connection cn = ds.getConnection();
         PreparedStatement ps = cn.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
@@ -71,17 +82,18 @@ public class DaoPer {
         return dU;
     }
 
-    public void insertarUsuario(DominioUsuarios u) throws SQLException {
-        String sql = "INSERT INTO usuarios (usuario, login, password, fechaCreacion,status, email, rol) VALUES(?,?,?,?,?,?,?)";
+    public void insertarUsuario(DominioUsuarios u) throws SQLException, Exception {
+        String sql = "INSERT INTO usuarios (usuario, login, password, status, idPerfil, email) VALUES(?,?,?,?,?,?)";
+        Utilerias utilerias = new Utilerias();
+        String password = utilerias.md5(u.getPassword());
         Connection cn = ds.getConnection();
         PreparedStatement ps = cn.prepareStatement(sql);
         ps.setString(1, u.getUsuario());
         ps.setString(2, u.getLogin());
-        ps.setString(3, u.getPassword());
-        ps.setString(4, u.getFechaCreacion());
-        ps.setInt(5, u.getStatus2());
+        ps.setString(3, password);
+        ps.setInt(4, u.getStatus2());
+        ps.setInt(5, u.getIdPerfil());
         ps.setString(6, u.getEmail());
-        ps.setInt(7, u.getRol());
         try {
             ps.executeUpdate();
 
@@ -208,19 +220,166 @@ public class DaoPer {
         BaseDatos b = new BaseDatos();
         Connection cn = ds.getConnection();
         PreparedStatement ps = cn.prepareStatement(sql);
-        try{
-             ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            b.setBaseDatos(rs.getString("baseDeDatos"));
-            b.setJndi(rs.getString("jndi"));
-        }
-        }
-        catch (Exception e ){
+        try {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                b.setIdBaseDatos(rs.getInt("idBaseDeDatos"));
+                b.setBaseDatos(rs.getString("baseDeDatos"));
+                b.setJndi(rs.getString("jndi"));
+            }
+        } catch (Exception e) {
             System.err.println(e);
-        }
-        finally{
+        } finally {
             cn.close();
         }
         return b;
+    }
+
+    public ArrayList<Perfiles> damePefiles() throws SQLException {
+        ArrayList<Perfiles> perfil = new ArrayList<>();
+        Connection cn = ds.getConnection();
+        String sql = "SELECT * FROM perfiles";
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Perfiles p = new Perfiles();
+                p.setIdPerfiles(rs.getInt("idPerfil"));
+                p.setPerfil(rs.getString("perfil"));
+                perfil.add(p);
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+
+        return perfil;
+    }
+
+    public Perfiles damePerfil(int id) throws SQLException {
+        Connection cn = ds.getConnection();
+        Perfiles p = new Perfiles();
+        String sql = "SELECT * FROM perfiles WHERE idPerfil =" + id;
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                p.setIdPerfiles(rs.getInt("idPerfil"));
+                p.setPerfil(rs.getString("perfil"));
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+        return p;
+    }
+
+    public void insertarUsuarioPerfil(UsuarioPerfil usuaPerfil, ArrayList<Acciones> acciones) throws SQLException {
+        Connection cn = ds.getConnection();
+        try {
+            for (int i = 0; i < acciones.size(); i++) {
+
+                int idAccion = acciones.get(i).getIdAccion();
+                String sql = "INSERT INTO usuarioPerfil (idPerfil, idModulo, idAccion) VALUES (?,?,?)";
+                PreparedStatement ps = cn.prepareStatement(sql);
+                ps.setInt(1, usuaPerfil.getIdPerfil());
+                ps.setInt(2, usuaPerfil.getIdModulo());
+                ps.setInt(3, idAccion);
+
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+    }
+//    public ArrayList<UsuarioPerfil> dameValoresUsuarioPerfil() throws SQLException {
+//        ArrayList<UsuarioPerfil> uP = new ArrayList<>();
+//        String sql = "SELECT * \n"
+//                + "FROM usuarioPerfil up\n"
+//                + "INNER JOIN basesDeDatos bd \n"
+//                + "on  bd.idBaseDeDatos = up.idBaseDeDatos\n"
+//                + "INNER JOIN modulos md \n"
+//                + "on md.idModulo = up.idModulo\n"
+//                + "INNER JOIN perfiles p \n"
+//                + "on p.idPerfil = up.idPerfil";
+//        ArrayList<UsuarioPerfil> usuarioPerfil = new ArrayList<>();
+//        Connection cn = ds.getConnection();
+//        PreparedStatement ps = cn.prepareStatement(sql);
+//        ResultSet rs = ps.executeQuery();
+//        while (rs.next()) {
+//        }
+//        return uP;
+//    }
+    public ArrayList<Acciones> dameAcciones() throws SQLException {
+        Connection cn = ds.getConnection();
+        ArrayList<Acciones> listAcciones = new ArrayList<>();
+        String sql = "SELECT * FROM acciones";
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Acciones acciones = new Acciones();
+                acciones.setIdAccion(rs.getInt("idAccion"));
+                acciones.setAccion(rs.getString("accion"));
+                acciones.setIdBoton(rs.getString("idBoton"));
+                acciones.setIdMOdulo(rs.getInt("idModulo"));
+                listAcciones.add(acciones);
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+
+        return listAcciones;
+    }
+
+    public Acciones dameAcciones(int idModulo) throws SQLException {
+        Connection cn = ds.getConnection();
+        Acciones acciones = new Acciones();
+        String sql = "SELECT * FROM acciones WHERE idAccion=" + idModulo;
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                acciones.setIdAccion(rs.getInt("idAccion"));
+                acciones.setAccion(rs.getString("accion"));
+                acciones.setIdBoton(rs.getString("idBoton"));
+                acciones.setIdMOdulo(rs.getInt("idModulo"));
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+
+        return acciones;
+    }
+
+    public ArrayList<Acciones> dameListaAcciones(int idAccion) throws SQLException {
+        ArrayList<Acciones> acciones = new ArrayList<>();
+        Connection cn = ds.getConnection();
+        String sql = "SELECT * FROM acciones WHERE idModulo=" + idAccion;
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Acciones accion = new Acciones();
+                accion.setAccion(rs.getString("accion"));
+                accion.setIdAccion(rs.getInt("idAccion"));
+                acciones.add(accion);
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+        return acciones;
     }
 }

@@ -22,7 +22,8 @@ public class Utilerias {
         return fecha;
     }
 
-    public static String md5(String clear) throws Exception {
+    public String md5(String clear) throws Exception {
+        String dato = null;
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] b = md.digest(clear.getBytes());
         int size = b.length;
