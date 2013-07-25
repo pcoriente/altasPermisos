@@ -54,7 +54,6 @@ public class MbUsuarios {
     Acciones accionesCmb = new Acciones();
     Perfiles perfil = new Perfiles();
     Perfiles perfil2 = new Perfiles();
-    ArrayList<UsuarioPerfil> tablaUsuarioPerfil = new ArrayList<>();
     DualListModel<Modulo> pickModulos = new DualListModel<>();
     ArrayList<Modulo> moduloOrigen = new ArrayList<>();
     ArrayList<Modulo> moduloFinal = new ArrayList<>();
@@ -149,14 +148,6 @@ public class MbUsuarios {
 
     public void setPickModulos(DualListModel<Modulo> pickModelos) {
         this.pickModulos = pickModelos;
-    }
-
-//    public ArrayList<UsuarioPerfil> getTablaUsuarioPerfil() throws SQLException {
-//        tablaUsuarioPerfil = dameDatosUsuarioPerfil();
-//        return tablaUsuarioPerfil;
-//    }
-    public void setTablaUsuarioPerfil(ArrayList<UsuarioPerfil> tablaUsuarioPerfil) {
-        this.tablaUsuarioPerfil = tablaUsuarioPerfil;
     }
 
     public Modulo getM3() {
@@ -358,19 +349,18 @@ public class MbUsuarios {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Sample info message", "PrimeFaces rocks!"));
         }
         perfil2.getIdUsuario();
-
-        //        ArrayList<Acciones> acciones = new ArrayList<>();
-//        acciones = (ArrayList<Acciones>) pickAcciones.getTarget();
-//        UsuarioPerfil usuaPerfil = new UsuarioPerfil();
-//        String jndi = bd.getJndi();
-//        DaoPer daoPermisos = new DaoPer(jndi);
-//        usuaPerfil.setIdPerfil(perfil2.getIdPerfiles());
-//        usuaPerfil.setIdModulo(modulo.getIdModulo());
-//        mPrueba = (ArrayList<Modulo>) pickModulos.getSource();
-//        daoPermisos.insertarUsuarioPerfil(usuaPerfil, acciones);
-//        m2.setIdModulo(0);
-//        perfil2.setIdPerfiles(0);
-//        bd.setIdBaseDatos(0);
+        ArrayList<Acciones> acciones = new ArrayList<>();
+        acciones = (ArrayList<Acciones>) pickAcciones.getTarget();
+        UsuarioPerfil usuaPerfil = new UsuarioPerfil();
+        String jndi = bd.getJndi();
+        DaoPer daoPermisos = new DaoPer(jndi);
+        usuaPerfil.setIdPerfil(perfil2.getIdPerfiles());
+        usuaPerfil.setIdModulo(modulo.getIdModulo());
+        mPrueba = (ArrayList<Modulo>) pickModulos.getSource();
+        daoPermisos.insertarUsuarioPerfil(usuaPerfil, acciones);
+        m2.setIdModulo(0);
+        perfil2.setIdPerfiles(0);
+        bd.setIdBaseDatos(0);
     }
 
     public void guardarAcciones() throws SQLException {

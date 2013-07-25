@@ -53,13 +53,14 @@
                         </p:selectOneMenu>
 
                     </h:panelGrid>
-                    <p:pickList  style="width: 200px"
-                                 id="PickAcciones"
-                                 effect="slide"
-                                 value="#{mbUsuarios.pickAcciones}"
-                                 var="ListaModulos"
-                                 itemLabel="#{ListaModulos}"
-                                 itemValue="#{ListaModulos}">
+                    <p:pickList  
+                        id="PickAcciones"
+                        style="width: 200px"
+                        effect="slide"
+                        value="#{mbUsuarios.pickAcciones}"
+                        var="ListaModulos"
+                        itemLabel="#{ListaModulos}"
+                        itemValue="#{ListaModulos}">
                         <f:converter converterId="traerAcciones"/>
                     </p:pickList>
                     <p:commandButton 
@@ -67,7 +68,9 @@
                         action="#{mbUsuarios.dameValoresCmb()}"
                         icon="ui-icon-disk"
                         />
-                    <p:dataTable>
+                    <p:dataTable
+                        value="#{mbUsuarios}"
+                        >
                         <p:column headerText="Modulos">
 
                         </p:column>
