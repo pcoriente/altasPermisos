@@ -347,7 +347,7 @@ public class MbUsuarios {
         if (bd.getIdBaseDatos() == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:", "Seleccione una Base de Datos"));
         } else {
-            
+
             perfil2.getIdUsuario();
             ArrayList<Acciones> acciones = new ArrayList<Acciones>();
             acciones = (ArrayList<Acciones>) pickAcciones.getTarget();
@@ -429,12 +429,12 @@ public class MbUsuarios {
         return perfiles;
     }
 
-//    public void dameValoresPickList() {
-//        ArrayList<Modulo> jjj = new ArrayList<Modulo>();
-//        ArrayList<Modulo> jjji = new ArrayList<>();
-//        jjj = (ArrayList<Modulo>) pickModulos.getTarget();
-//        jjj = (ArrayList<Modulo>) pickModulos.getSource();
-//    }
+    public void dameValoresPickList() {
+        ArrayList<Modulo> jjj = new ArrayList<Modulo>();
+        ArrayList<Modulo> jjji = new ArrayList<>();
+        jjj = (ArrayList<Modulo>) pickModulos.getTarget();
+        jjj = (ArrayList<Modulo>) pickModulos.getSource();
+    }
 
     private List<SelectItem> dameListaAcciones() throws SQLException {
         List<SelectItem> ListAcciones = new ArrayList<SelectItem>();
@@ -453,21 +453,25 @@ public class MbUsuarios {
     }
 
     public void dameModulosAcciones() throws SQLException {
-        
+
         String nomBd = bd.getBaseDatos();
         int idPerfil = perfil2.getIdPerfiles();
         int idModulo = modulo.getIdModulo();
-        
+
         DaoPer daoPermisos = new DaoPer();
         ArrayList<Acciones> acciones = new ArrayList<Acciones>();
         acciones = daoPermisos.dameValores(nomBd, idModulo, idPerfil);
-        for(Acciones ac : acciones){
-            if(ac.getIdPerfil()== 0){
+        for (Acciones ac : acciones) {
+            if (ac.getIdPerfil() == 0) {
                 accionesOrigen.add(ac);
-            }
-            else{
+            } else {
                 accionesDestino.add(ac);
             }
         }
+    }
+
+    public String entrar() {
+        String valor = "altasPermisos";
+        return valor;
     }
 }

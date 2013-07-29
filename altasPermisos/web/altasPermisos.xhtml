@@ -13,9 +13,9 @@
                 <h:graphicImage  library="images" name="encabezado.jpg" /> 
                 <p:panel header="Altas" >
                     <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
-                    <h:graphicImage id="perfil" style="float: left" onclick="perfil.show();" library="images" name="perfil.png">
+                    <h:graphicImage id="bds" style="float: left" onclick="sql.show();" library="images" name="sql.jpg">
                     </h:graphicImage>
-                    <h:graphicImage id="bds" style="float: left" onclick="sql.show();" library="images" name="Sql.png">
+                    <h:graphicImage id="perfil" style="float: left" onclick="perfil.show();" library="images" name="perfil.png">
                     </h:graphicImage>
                     <h:graphicImage id="altasPermisos" style="float: left" onclick="dlg.show();" library="images" name="usuarios.png">
                     </h:graphicImage>
@@ -32,9 +32,9 @@
                         <f:selectItems value="#{mbUsuarios.listaBaseDatos}"/>
                         <f:converter converterId="traerBd"/>
                         <p:ajax listener="#{mbUsuarios.dameModulosAcciones()}"
-                                    event="change" 
-                                    update="PickAcciones"
-                                    process="@this listaPerfiles modulos"/>
+                                event="change" 
+                                update="PickAcciones"
+                                process="@this listaPerfiles modulos"/>
                     </p:selectOneMenu>
                     <h:panelGrid columns="2">
                         <p:outputLabel> Perfiles.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
@@ -47,7 +47,7 @@
                                     event="change" 
                                     update="PickAcciones"
                                     process="@this modulos listaBd"/>
-                            
+
                         </p:selectOneMenu>
                         <p:outputLabel>Modulo.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
                         <p:selectOneMenu 
@@ -154,24 +154,14 @@
                                        update="accion  idBoton modulos2"
                                        oncomplete="acciones.hide();"/>
                 </p:dialog>
-                <p:dialog  modal="true" header="Base de Datos Sql" widgetVar="Sql" >
-                    <p:inputText id="accion" value="#{mbUsuarios.acciones.accion}" />
-                    <p:watermark for="accion" value="Accion"/>
-                    <br></br>
-                    <br></br>
-                    <p:inputText id="idBoton" value="#{mbUsuarios.acciones.idBoton}"/>
-                    <p:watermark for="idBoton" value="Nombre IdBtn"/>
-                    <br></br><br></br>
-                    <p:selectOneMenu  id="modulos2" style="width: 210px;" value="#{mbUsuarios.m3}">
-                        <f:selectItems value="#{mbUsuarios.listaModulos}"/>
-                        <f:converter converterId="traerModulos"/>
-                    </p:selectOneMenu>
-                    <br></br><br></br>
+                <p:dialog  modal="true" header="Base de Datos Sql" widgetVar="sql" >
+                   
+                    
                     <p:commandButton   value="Guardar" 
                                        icon="ui-icon-disk"
                                        action="#{mbUsuarios.guardarAcciones()}"
                                        update="accion  idBoton modulos2"
-                                       oncomplete="acciones.hide();"/>
+                                       oncomplete="Sql.hide();"/>
                 </p:dialog>
             </div>
         </h:form>
