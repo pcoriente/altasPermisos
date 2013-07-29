@@ -16,6 +16,24 @@ public class Acciones {
     private boolean Sta;
     private String idBoton;
     private int idMOdulo;
+    private String acciones;
+    private int idPerfil;
+
+    public int getIdPerfil() {
+        return idPerfil;
+    }
+
+    public void setIdPerfil(int idPerfil) {
+        this.idPerfil = idPerfil;
+    }
+
+    public String getAcciones() {
+        return acciones;
+    }
+
+    public void setAcciones(String acciones) {
+        this.acciones = acciones;
+    }
 
     public int getStatus() {
         return status;

@@ -10,6 +10,7 @@ import dominios.BaseDatos;
 import dominios.DominioUsuarios;
 import dominios.Modulo;
 import dominios.Perfiles;
+import dominios.TablaAcciones;
 import dominios.UsuarioPerfil;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -346,21 +347,22 @@ public class MbUsuarios {
         if (bd.getIdBaseDatos() == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:", "Seleccione una Base de Datos"));
         } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Sample info message", "PrimeFaces rocks!"));
+            
+            perfil2.getIdUsuario();
+            ArrayList<Acciones> acciones = new ArrayList<>();
+            acciones = (ArrayList<Acciones>) pickAcciones.getTarget();
+            UsuarioPerfil usuaPerfil = new UsuarioPerfil();
+            String jndi = bd.getJndi();
+            DaoPer daoPermisos = new DaoPer(jndi);
+            usuaPerfil.setIdPerfil(perfil2.getIdPerfiles());
+            usuaPerfil.setIdModulo(modulo.getIdModulo());
+            mPrueba = (ArrayList<Modulo>) pickModulos.getSource();
+            daoPermisos.insertarUsuarioPerfil(usuaPerfil, acciones);
+            m2.setIdModulo(0);
+            perfil2.setIdPerfiles(0);
+            bd.setIdBaseDatos(0);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Se insertaron los datos Correctamente"));
         }
-        perfil2.getIdUsuario();
-        ArrayList<Acciones> acciones = new ArrayList<>();
-        acciones = (ArrayList<Acciones>) pickAcciones.getTarget();
-        UsuarioPerfil usuaPerfil = new UsuarioPerfil();
-        String jndi = bd.getJndi();
-        DaoPer daoPermisos = new DaoPer(jndi);
-        usuaPerfil.setIdPerfil(perfil2.getIdPerfiles());
-        usuaPerfil.setIdModulo(modulo.getIdModulo());
-        mPrueba = (ArrayList<Modulo>) pickModulos.getSource();
-        daoPermisos.insertarUsuarioPerfil(usuaPerfil, acciones);
-        m2.setIdModulo(0);
-        perfil2.setIdPerfiles(0);
-        bd.setIdBaseDatos(0);
     }
 
     public void guardarAcciones() throws SQLException {
@@ -427,13 +429,6 @@ public class MbUsuarios {
         return perfiles;
     }
 
-//    public ArrayList<UsuarioPerfil> dameDatosUsuarioPerfil() throws SQLException {
-//        ArrayList<UsuarioPerfil> uP = new ArrayList<>();
-//        DaoPer daoPermisos = new DaoPer();
-//        uP = daoPermisos.dameValoresUsuarioPerfil();
-//
-//        return uP;
-//    }
     public void dameValoresPickList() {
         ArrayList<Modulo> jjj = new ArrayList<>();
         ArrayList<Modulo> jjji = new ArrayList<>();
@@ -458,8 +453,21 @@ public class MbUsuarios {
     }
 
     public void dameModulosAcciones() throws SQLException {
+        
+        String nomBd = bd.getBaseDatos();
+        int idPerfil = perfil2.getIdPerfiles();
         int idModulo = modulo.getIdModulo();
+        
         DaoPer daoPermisos = new DaoPer();
-        accionesOrigen = daoPermisos.dameListaAcciones(idModulo);
+        ArrayList<Acciones> acciones = new ArrayList<>();
+        acciones = daoPermisos.dameValores(nomBd, idModulo, idPerfil);
+        for(Acciones ac : acciones){
+            if(ac.getIdPerfil()== 0){
+                accionesOrigen.add(ac);
+            }
+            else{
+                accionesDestino.add(ac);
+            }
+        }
     }
 }

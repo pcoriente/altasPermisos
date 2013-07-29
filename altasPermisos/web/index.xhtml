@@ -10,40 +10,15 @@
     </h:head>
     <h:body>
         <h:form>
-            <p:selectOneMenu id="listaBd" style="width: 230px" 
-                             value="#{mbUsuarios.bd}">
-                <f:selectItems value="#{mbUsuarios.listaBaseDatos}"/>
-                <f:converter converterId="traerBd"/>
-                <p:ajax  update="listaPerfiles"/>
-            </p:selectOneMenu>
-            <p:outputLabel> Perfiles.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
-            <p:selectOneMenu  
-                disabled="#{mbUsuarios.bd==null || mbUsuarios.bd.idBaseDatos==0}"
-                id="listaPerfiles" style="width: 230px"
-                value="#{mbUsuarios.perfil2}">
-                <f:selectItems value="#{mbUsuarios.listaPerfiles}" />
-                <f:converter converterId="traerPerfil"/>
-                <p:ajax event="change" 
-                        listener="#{mbUsuarios.dameValoresCmb()}" 
-                        update="modulos"
-                        process="@this"/>
-            </p:selectOneMenu>
-            <h:graphicImage id="perfil" style="float: left" onclick="perfil.show();" library="images" name="perfil.png">
-            </h:graphicImage>
-            <p:outputLabel>Modulo.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
-            <p:selectOneMenu 
-                id="modulos" 
-                disabled="#{mbUsuarios.perfil2.perfil==null}"
-                style="width: 230px"
-                value="#{mbUsuarios.modulo}">
-                <f:selectItems value="#{mbUsuarios.listaModulos}"/>
-                <f:converter converterId="traerModulos"/>
-                <p:ajax listener="#{mbUsuarios.dameModulosAcciones()}"
-                        event="change" 
-                        process="@this"/>
-            </p:selectOneMenu>
-            <h:graphicImage id="nuevoModulo" style="float: left" onclick="modulo.show();" library="images" name="nuevaPagina.png">
-            </h:graphicImage>
+            <p:dataTable id="tablaAcciones"
+                         value="#{mbUsuarios.tablaUsuarioPerfil}"
+                         var="tablaPerfil">
+                <p:column headerText="Modulos">
+                    <h:outputText value="#{tablaPerfil.accion}"/>
+                </p:column>
+            </p:dataTable>
+
+
         </h:form>
     </h:body>
 </html>

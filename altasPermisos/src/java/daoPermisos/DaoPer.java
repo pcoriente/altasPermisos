@@ -9,12 +9,14 @@ import dominios.BaseDatos;
 import dominios.DominioUsuarios;
 import dominios.Modulo;
 import dominios.Perfiles;
+import dominios.TablaAcciones;
 import dominios.UsuarioPerfil;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -263,8 +265,6 @@ public class DaoPer {
         String sql = "SELECT * FROM perfiles WHERE idPerfil =" + id;
         PreparedStatement ps = cn.prepareStatement(sql);
         try {
-
-
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 p.setIdPerfiles(rs.getInt("idPerfil"));
@@ -281,15 +281,16 @@ public class DaoPer {
     public void insertarUsuarioPerfil(UsuarioPerfil usuaPerfil, ArrayList<Acciones> acciones) throws SQLException {
         Connection cn = ds.getConnection();
         try {
+            String sqlElimiar = "DELETE FROM usuarioPerfil WHERE idPerfil=" + usuaPerfil.getIdPerfil() + " and idModulo = " + usuaPerfil.getIdModulo();
+            Statement st = cn.createStatement();
+            st.executeUpdate(sqlElimiar);
+            String sql = "INSERT INTO usuarioPerfil (idPerfil, idModulo, idAccion) VALUES (?,?,?)";
+            PreparedStatement ps = cn.prepareStatement(sql);
             for (int i = 0; i < acciones.size(); i++) {
-
                 int idAccion = acciones.get(i).getIdAccion();
-                String sql = "INSERT INTO usuarioPerfil (idPerfil, idModulo, idAccion) VALUES (?,?,?)";
-                PreparedStatement ps = cn.prepareStatement(sql);
                 ps.setInt(1, usuaPerfil.getIdPerfil());
                 ps.setInt(2, usuaPerfil.getIdModulo());
                 ps.setInt(3, idAccion);
-
                 ps.executeUpdate();
             }
         } catch (Exception e) {
@@ -316,6 +317,7 @@ public class DaoPer {
 //        }
 //        return uP;
 //    }
+
     public ArrayList<Acciones> dameAcciones() throws SQLException {
         Connection cn = ds.getConnection();
         ArrayList<Acciones> listAcciones = new ArrayList<>();
@@ -381,5 +383,36 @@ public class DaoPer {
             cn.close();
         }
         return acciones;
+    }
+
+    public ArrayList<Acciones> dameValores(String bd, int modulo, int perfil) throws SQLException {
+        ArrayList<Acciones> tabla = new ArrayList<>();
+        Connection cn = ds.getConnection();
+        String sql = "SELECT * FROM modulos m \n"
+                + "                    INNER JOIN acciones a on \n"
+                + "                    a.idModulo = m.idModulo\n"
+                + "                    LEFT JOIN(SELECT * FROM  " + bd + ".dbo.usuarioPerfil WHERE idPerfil=" + perfil + ") up\n"
+                + "                    on up.idModulo=m.idModulo\n"
+                + "                    and up.idAccion=a.idAccion\n"
+                + "                    where m.idModulo=" + modulo;
+
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Acciones tA = new Acciones();
+                tA.setIdAccion(rs.getInt("idAccion"));
+                tA.setIdMOdulo(rs.getInt("idModulo"));
+                tA.setAccion(rs.getString("accion"));
+                tA.setIdPerfil(rs.getInt("idPerfil"));
+                tabla.add(tA);
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+
+        return tabla;
     }
 }

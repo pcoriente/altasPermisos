@@ -29,6 +29,10 @@
                                      value="#{mbUsuarios.bd}">
                         <f:selectItems value="#{mbUsuarios.listaBaseDatos}"/>
                         <f:converter converterId="traerBd"/>
+                        <p:ajax listener="#{mbUsuarios.dameModulosAcciones()}"
+                                    event="change" 
+                                    update="PickAcciones"
+                                    process="@this listaPerfiles modulos"/>
                     </p:selectOneMenu>
                     <h:panelGrid columns="2">
                         <p:outputLabel> Perfiles.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
@@ -37,8 +41,12 @@
                             value="#{mbUsuarios.perfil2}">
                             <f:selectItems value="#{mbUsuarios.listaPerfiles}" />
                             <f:converter converterId="traerPerfil"/>
+                            <p:ajax listener="#{mbUsuarios.dameModulosAcciones()}"
+                                    event="change" 
+                                    update="PickAcciones"
+                                    process="@this modulos listaBd"/>
+                            
                         </p:selectOneMenu>
-
                         <p:outputLabel>Modulo.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
                         <p:selectOneMenu 
                             id="modulos" 
@@ -49,7 +57,7 @@
                             <p:ajax listener="#{mbUsuarios.dameModulosAcciones()}"
                                     event="change" 
                                     update="PickAcciones"
-                                    process="@this"/>
+                                    process="@this listaPerfiles listaBd"/>
                         </p:selectOneMenu>
 
                     </h:panelGrid>
@@ -68,16 +76,6 @@
                         action="#{mbUsuarios.dameValoresCmb()}"
                         icon="ui-icon-disk"
                         />
-                    <p:dataTable
-                        value="#{mbUsuarios}"
-                        >
-                        <p:column headerText="Modulos">
-
-                        </p:column>
-                        <p:column headerText="Modificaion">
-
-                        </p:column>
-                    </p:dataTable>
                 </p:panel>
                 <p:dialog modal="true" header="Altas Usuarios" widgetVar="dlg">
                     <br></br>
