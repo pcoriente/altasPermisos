@@ -53,7 +53,7 @@ public class DaoPer {
     }
 
     public ArrayList<DominioUsuarios> dameUsuarios() throws SQLException {
-        ArrayList<DominioUsuarios> usuarios = new ArrayList<>();
+        ArrayList<DominioUsuarios> usuarios = new ArrayList<DominioUsuarios>();
         String sql = "SELECT * FROM usuarios";
         Connection cn = ds.getConnection();
         PreparedStatement ps = cn.prepareStatement(sql);
@@ -121,7 +121,7 @@ public class DaoPer {
     }
 
     public ArrayList<Modulo> dameModulos() throws SQLException {
-        ArrayList<Modulo> modulos = new ArrayList<>();
+        ArrayList<Modulo> modulos = new ArrayList<Modulo>();
         String sqlModulos = "SELECT * FROM modulos";
         Connection cn = ds.getConnection();
         PreparedStatement ps = cn.prepareStatement(sqlModulos);
@@ -238,7 +238,7 @@ public class DaoPer {
     }
 
     public ArrayList<Perfiles> damePefiles() throws SQLException {
-        ArrayList<Perfiles> perfil = new ArrayList<>();
+        ArrayList<Perfiles> perfil = new ArrayList<Perfiles>();
         Connection cn = ds.getConnection();
         String sql = "SELECT * FROM perfiles";
         PreparedStatement ps = cn.prepareStatement(sql);
@@ -320,7 +320,7 @@ public class DaoPer {
 
     public ArrayList<Acciones> dameAcciones() throws SQLException {
         Connection cn = ds.getConnection();
-        ArrayList<Acciones> listAcciones = new ArrayList<>();
+        ArrayList<Acciones> listAcciones = new ArrayList<Acciones>();
         String sql = "SELECT * FROM acciones";
         PreparedStatement ps = cn.prepareStatement(sql);
         try {
@@ -365,7 +365,7 @@ public class DaoPer {
     }
 
     public ArrayList<Acciones> dameListaAcciones(int idAccion) throws SQLException {
-        ArrayList<Acciones> acciones = new ArrayList<>();
+        ArrayList<Acciones> acciones = new ArrayList<Acciones>();
         Connection cn = ds.getConnection();
         String sql = "SELECT * FROM acciones WHERE idModulo=" + idAccion;
         PreparedStatement ps = cn.prepareStatement(sql);
@@ -386,7 +386,7 @@ public class DaoPer {
     }
 
     public ArrayList<Acciones> dameValores(String bd, int modulo, int perfil) throws SQLException {
-        ArrayList<Acciones> tabla = new ArrayList<>();
+        ArrayList<Acciones> tabla = new ArrayList<Acciones>();
         Connection cn = ds.getConnection();
         String sql = "SELECT * FROM modulos m \n"
                 + "                    INNER JOIN acciones a on \n"
