@@ -349,7 +349,7 @@ public class MbUsuarios {
         } else {
             
             perfil2.getIdUsuario();
-            ArrayList<Acciones> acciones = new ArrayList<>();
+            ArrayList<Acciones> acciones = new ArrayList<Acciones>();
             acciones = (ArrayList<Acciones>) pickAcciones.getTarget();
             UsuarioPerfil usuaPerfil = new UsuarioPerfil();
             String jndi = bd.getJndi();
