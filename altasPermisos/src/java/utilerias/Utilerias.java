@@ -23,16 +23,18 @@ public class Utilerias {
     }
 
     public String md5(String clear) throws Exception {
-        String dato = null;
+        //String dato = null;
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] b = md.digest(clear.getBytes());
         int size = b.length;
-        StringBuffer h = new StringBuffer(size);
+        StringBuilder h = new StringBuilder(size);
         //algoritmo y arreglo md5
         for (int i = 0; i < size; i++) {
             int u = b[i] & 255;
             if (u < 16) {
-                h.append("0" + Integer.toHexString(u));
+                h.append("0");
+                h.append(Integer.toHexString(u));
+                //h.append("0" + Integer.toHexString(u));
             } else {
                 h.append(Integer.toHexString(u));
             }
