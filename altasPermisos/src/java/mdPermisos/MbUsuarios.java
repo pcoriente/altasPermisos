@@ -431,7 +431,7 @@ public class MbUsuarios {
 
     public void dameValoresPickList() {
         ArrayList<Modulo> jjj = new ArrayList<Modulo>();
-        ArrayList<Modulo> jjji = new ArrayList<>();
+        ArrayList<Modulo> jjji = new ArrayList<Modulo>();
         jjj = (ArrayList<Modulo>) pickModulos.getTarget();
         jjj = (ArrayList<Modulo>) pickModulos.getSource();
     }
