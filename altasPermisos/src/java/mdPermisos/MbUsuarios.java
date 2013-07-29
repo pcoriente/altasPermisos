@@ -55,7 +55,7 @@ public class MbUsuarios {
     Acciones accionesCmb = new Acciones();
     Perfiles perfil = new Perfiles();
     Perfiles perfil2 = new Perfiles();
-    DualListModel<Modulo> pickModulos = new DualListModel<>();
+    DualListModel<Modulo> pickModulos = new DualListModel<Modulo>();
     ArrayList<Modulo> moduloOrigen = new ArrayList<Modulo>();
     ArrayList<Modulo> moduloFinal = new ArrayList<Modulo>();
     ArrayList<Modulo> mPrueba = new ArrayList<Modulo>();
