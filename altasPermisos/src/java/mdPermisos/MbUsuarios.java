@@ -48,20 +48,20 @@ public class MbUsuarios {
     Modulo m2 = new Modulo();
     Modulo m3 = new Modulo();
     BaseDatos bd = new BaseDatos();
-    ArrayList<DominioUsuarios> tablaUsuarios = new ArrayList<DominioUsuarios>();
+    ArrayList<DominioUsuarios> tablaUsuarios = new ArrayList<>();
     private boolean s;
     Modulo modulo = new Modulo();
     Acciones acciones = new Acciones();
     Acciones accionesCmb = new Acciones();
     Perfiles perfil = new Perfiles();
     Perfiles perfil2 = new Perfiles();
-    DualListModel<Modulo> pickModulos = new DualListModel<Modulo>();
-    ArrayList<Modulo> moduloOrigen = new ArrayList<Modulo>();
-    ArrayList<Modulo> moduloFinal = new ArrayList<Modulo>();
-    ArrayList<Modulo> mPrueba = new ArrayList<Modulo>();
-    DualListModel<Acciones> pickAcciones = new DualListModel<Acciones>();
-    ArrayList<Acciones> accionesOrigen = new ArrayList<Acciones>();
-    ArrayList<Acciones> accionesDestino = new ArrayList<Acciones>();
+    DualListModel<Modulo> pickModulos = new DualListModel<>();
+    ArrayList<Modulo> moduloOrigen = new ArrayList<>();
+    ArrayList<Modulo> moduloFinal = new ArrayList<>();
+    ArrayList<Modulo> mPrueba = new ArrayList<>();
+    DualListModel<Acciones> pickAcciones = new DualListModel<>();
+    ArrayList<Acciones> accionesOrigen = new ArrayList<>();
+    ArrayList<Acciones> accionesDestino = new ArrayList<>();
 
     public ArrayList<Acciones> getAccionesOrigen() {
         return accionesOrigen;
@@ -80,7 +80,7 @@ public class MbUsuarios {
     }
 
     public DualListModel<Acciones> getPickAcciones() {
-        pickAcciones = new DualListModel<Acciones>(accionesOrigen, accionesDestino);
+        pickAcciones = new DualListModel<>(accionesOrigen, accionesDestino);
         return pickAcciones;
     }
 
@@ -143,7 +143,7 @@ public class MbUsuarios {
     public DualListModel<Modulo> getPickModulos() throws SQLException {
         DaoPer p = new DaoPer();
         moduloOrigen = p.dameModulos();
-        pickModulos = new DualListModel<Modulo>(moduloOrigen, moduloFinal);
+        pickModulos = new DualListModel<>(moduloOrigen, moduloFinal);
         return pickModulos;
     }
 
@@ -280,7 +280,7 @@ public class MbUsuarios {
     }
 
     private List<SelectItem> dameValores() throws SQLException {
-        List<SelectItem> usuarios = new ArrayList<SelectItem>();
+        List<SelectItem> usuarios = new ArrayList<>();
         ArrayList<DominioUsuarios> du = new ArrayList<DominioUsuarios>();
         DaoPer dp = new DaoPer();
         DominioUsuarios dominioUsuario = new DominioUsuarios();
@@ -327,7 +327,7 @@ public class MbUsuarios {
     }
 
     private List<SelectItem> dameModulos() throws SQLException {
-        List<SelectItem> Modulos = new ArrayList<SelectItem>();
+        List<SelectItem> Modulos = new ArrayList<>();
         ArrayList<Modulo> modul = new ArrayList<Modulo>();
         DaoPer dp = new DaoPer();
         Modulo modulo = new Modulo();
@@ -347,9 +347,9 @@ public class MbUsuarios {
         if (bd.getIdBaseDatos() == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:", "Seleccione una Base de Datos"));
         } else {
-
+            
             perfil2.getIdUsuario();
-            ArrayList<Acciones> acciones = new ArrayList<Acciones>();
+            ArrayList<Acciones> acciones = new ArrayList<>();
             acciones = (ArrayList<Acciones>) pickAcciones.getTarget();
             UsuarioPerfil usuaPerfil = new UsuarioPerfil();
             String jndi = bd.getJndi();
@@ -391,7 +391,7 @@ public class MbUsuarios {
     }
 
     private List<SelectItem> dameBd() throws SQLException {
-        List<SelectItem> Bds = new ArrayList<SelectItem>();
+        List<SelectItem> Bds = new ArrayList<>();
         ArrayList<BaseDatos> bds = new ArrayList<BaseDatos>();
         DaoPer dp = new DaoPer();
         BaseDatos baseDatos = new BaseDatos();
@@ -414,7 +414,7 @@ public class MbUsuarios {
     }
 
     private List<SelectItem> damePerfiles() throws SQLException {
-        List<SelectItem> perfiles = new ArrayList<SelectItem>();
+        List<SelectItem> perfiles = new ArrayList<>();
         ArrayList<Perfiles> perfil = new ArrayList<Perfiles>();
         DaoPer dp = new DaoPer();
         Perfiles pF = new Perfiles();
@@ -430,14 +430,14 @@ public class MbUsuarios {
     }
 
     public void dameValoresPickList() {
-        ArrayList<Modulo> jjj = new ArrayList<Modulo>();
+        ArrayList<Modulo> jjj = new ArrayList<>();
         ArrayList<Modulo> jjji = new ArrayList<>();
         jjj = (ArrayList<Modulo>) pickModulos.getTarget();
         jjj = (ArrayList<Modulo>) pickModulos.getSource();
     }
 
     private List<SelectItem> dameListaAcciones() throws SQLException {
-        List<SelectItem> ListAcciones = new ArrayList<SelectItem>();
+        List<SelectItem> ListAcciones = new ArrayList<>();
         ArrayList<Acciones> du = new ArrayList<Acciones>();
         DaoPer dp = new DaoPer();
         Acciones accions = new Acciones();
@@ -453,25 +453,21 @@ public class MbUsuarios {
     }
 
     public void dameModulosAcciones() throws SQLException {
-
+        
         String nomBd = bd.getBaseDatos();
         int idPerfil = perfil2.getIdPerfiles();
         int idModulo = modulo.getIdModulo();
-
+        
         DaoPer daoPermisos = new DaoPer();
-        ArrayList<Acciones> acciones = new ArrayList<Acciones>();
+        ArrayList<Acciones> acciones = new ArrayList<>();
         acciones = daoPermisos.dameValores(nomBd, idModulo, idPerfil);
-        for (Acciones ac : acciones) {
-            if (ac.getIdPerfil() == 0) {
+        for(Acciones ac : acciones){
+            if(ac.getIdPerfil()== 0){
                 accionesOrigen.add(ac);
-            } else {
+            }
+            else{
                 accionesDestino.add(ac);
             }
         }
-    }
-
-    public String entrar() {
-        String valor = "altasPermisos";
-        return valor;
     }
 }
