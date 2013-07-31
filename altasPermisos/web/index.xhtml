@@ -7,9 +7,22 @@
     </h:head>
     <h:body>
         <h:form>
-            <p:commandButton value="entrar"
-                             action="#{mbUsuarios.entrar()}"
-                             ajax="false"/>
+            <h:panelGrid  id="columnas" columns="3">
+                <p:outputLabel id="labelBd" value="Base de Datos"/>
+                <p:inputText id="bdAltas" 
+                             value="#{mbUsuarios.bdAltas.baseDatos}"
+                             required="true"
+                             requiredMessage="Ingresa los datos correspondientes"
+                             label="Bd"
+                             />
+                <p:message for="bdAltas"/>
+            </h:panelGrid>
+            <p:commandButton   value="Guardar" 
+                               icon="ui-icon-disk"
+                               action="#{mbUsuarios.guardarBds()}"
+                               update="columnas"
+                              
+                               />
         </h:form>
     </h:body>
 </html>

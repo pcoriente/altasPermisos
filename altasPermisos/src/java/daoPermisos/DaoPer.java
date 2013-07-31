@@ -84,8 +84,9 @@ public class DaoPer {
         return dU;
     }
 
-    public void insertarUsuario(DominioUsuarios u) throws SQLException, Exception {
-        String sql = "INSERT INTO usuarios (usuario, login, password, status, idPerfil, email) VALUES(?,?,?,?,?,?)";
+    public void insertarUsuario(DominioUsuarios u, int bd, int perfil) throws SQLException, Exception {
+        String sql = "INSERT INTO usuarios (usuario,login, password,email) VALUES(?,?,?,?)";
+        String sqlIdentity = "SELECT @@IDENTITY as indentidad";
         Utilerias utilerias = new Utilerias();
         String password = utilerias.md5(u.getPassword());
         Connection cn = ds.getConnection();
@@ -93,11 +94,18 @@ public class DaoPer {
         ps.setString(1, u.getUsuario());
         ps.setString(2, u.getLogin());
         ps.setString(3, password);
-        ps.setInt(4, u.getStatus2());
-        ps.setInt(5, u.getIdPerfil());
-        ps.setString(6, u.getEmail());
+        ps.setString(4, u.getEmail());
         try {
             ps.executeUpdate();
+            ps = cn.prepareStatement(sqlIdentity);
+            ResultSet rs = ps.executeQuery();
+            int identidad = 0;
+            while (rs.next()) {
+                identidad = rs.getInt("indentidad");
+            }
+            insertarAcceso(identidad, bd, perfil);
+
+
 
         } catch (Exception e) {
             System.err.println(e);
@@ -188,12 +196,11 @@ public class DaoPer {
 
     public void insertarAcciones(Acciones acciones) throws SQLException {
         Connection cn = ds.getConnection();
-        String sql = "INSERT INTO acciones (accion, status, idBoton, idModulo) VALUES(?,?,?,?)";
+        String sql = "INSERT INTO acciones (accion,  idBoton, idModulo) VALUES(?,?,?)";
         PreparedStatement ps = cn.prepareStatement(sql);
         ps.setString(1, acciones.getAccion());
-        ps.setInt(2, acciones.getStatus());
-        ps.setString(3, acciones.getIdBoton());
-        ps.setInt(4, acciones.getIdMOdulo());
+        ps.setString(2, acciones.getIdBoton());
+        ps.setInt(1, acciones.getIdMOdulo());
         try {
             ps.executeUpdate();
         } catch (Exception e) {
@@ -389,12 +396,12 @@ public class DaoPer {
         ArrayList<Acciones> tabla = new ArrayList<Acciones>();
         Connection cn = ds.getConnection();
         String sql = "SELECT * FROM modulos m \n"
-                + "                    INNER JOIN acciones a on \n"
-                + "                    a.idModulo = m.idModulo\n"
-                + "                    LEFT JOIN(SELECT * FROM  " + bd + ".dbo.usuarioPerfil WHERE idPerfil=" + perfil + ") up\n"
-                + "                    on up.idModulo=m.idModulo\n"
-                + "                    and up.idAccion=a.idAccion\n"
-                + "                    where m.idModulo=" + modulo;
+                + "   INNER JOIN acciones a on \n"
+                + "   a.idModulo = m.idModulo\n"
+                + "   LEFT JOIN(SELECT * FROM  " + bd + ".dbo.usuarioPerfil WHERE idPerfil=" + perfil + ") up\n"
+                + "   on up.idModulo=m.idModulo\n"
+                + "   and up.idAccion=a.idAccion\n"
+                + "   where m.idModulo=" + modulo + "and  up.idPerfil<>0";
 
         PreparedStatement ps = cn.prepareStatement(sql);
         try {
@@ -414,5 +421,36 @@ public class DaoPer {
         }
 
         return tabla;
+    }
+
+    public void guardarBaseDatos(BaseDatos bdAltas) throws SQLException {
+        Connection cn = ds.getConnection();
+        String sql = "INSERT INTO basesDeDatos (baseDeDatos, jndi) VALUES(?,?)";
+        PreparedStatement ps = cn.prepareStatement(sql);
+        ps.setString(1, bdAltas.getBaseDatos());
+        ps.setString(2, bdAltas.getJndi());
+        try {
+            ps.executeQuery();
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+
+    }
+
+    public void insertarAcceso(int idUsuario, int idBd, int idPerfil) throws SQLException {
+        Connection cn = ds.getConnection();
+        String sql = "INSERT INTO accesos (idUsuario, idDbs,idPerfil) VALUES(?,?,?)";
+        PreparedStatement ps = cn.prepareStatement(sql);
+        ps.setInt(1, idUsuario);
+        ps.setInt(2, idBd);
+        ps.setInt(3, idPerfil);
+        try {
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+
     }
 }
