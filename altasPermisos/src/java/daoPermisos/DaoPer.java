@@ -114,18 +114,26 @@ public class DaoPer {
         }
     }
 
-    public void guardarModulo(Modulo m) throws SQLException {
+    public int guardarModulo(Modulo m) throws SQLException {
+        int identity = 0;
         String sqlGuardarModulo = "INSERT INTO modulos (modulo) VALUES(?)";
+        String sqlIdentity = "SELECT @@IDENTITY as indentidad";
         Connection cn = ds.getConnection();
         PreparedStatement ps = cn.prepareStatement(sqlGuardarModulo);
         ps.setString(1, m.getModulo());
         try {
             ps.executeUpdate();
+            ps = cn.prepareStatement(sqlIdentity);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                identity = rs.getInt("indentidad");
+            }
         } catch (Exception e) {
             System.err.println(e);
         } finally {
             cn.close();
         }
+        return identity;
     }
 
     public ArrayList<Modulo> dameModulos() throws SQLException {
@@ -200,7 +208,7 @@ public class DaoPer {
         PreparedStatement ps = cn.prepareStatement(sql);
         ps.setString(1, acciones.getAccion());
         ps.setString(2, acciones.getIdBoton());
-        ps.setInt(1, acciones.getIdMOdulo());
+        ps.setInt(3, acciones.getIdMOdulo());
         try {
             ps.executeUpdate();
         } catch (Exception e) {
@@ -210,18 +218,26 @@ public class DaoPer {
         }
     }
 
-    public void insertarPerfil(Perfiles perfil) throws SQLException {
+    public int insertarPerfil(Perfiles perfil) throws SQLException {
+        int identity = 0;
         Connection cn = ds.getConnection();
         String sql = "INSERT INTO perfiles VALUES (?)";
+        String sqlIdentity = "SELECT @@IDENTITY as indentidad";
         PreparedStatement ps = cn.prepareStatement(sql);
         ps.setString(1, perfil.getPerfil());
         try {
             ps.executeUpdate();
+            ps = cn.prepareStatement(sqlIdentity);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                identity = rs.getInt("indentidad");
+            }
         } catch (Exception e) {
             System.err.println(e);
         } finally {
             cn.close();
         }
+        return identity;
     }
 
     public BaseDatos dameBaseDatos(int idBaseDatos) throws SQLException {
@@ -401,7 +417,7 @@ public class DaoPer {
                 + "   LEFT JOIN(SELECT * FROM  " + bd + ".dbo.usuarioPerfil WHERE idPerfil=" + perfil + ") up\n"
                 + "   on up.idModulo=m.idModulo\n"
                 + "   and up.idAccion=a.idAccion\n"
-                + "   where m.idModulo=" + modulo + "and  up.idPerfil<>0";
+                + "   where m.idModulo=" + modulo;
 
         PreparedStatement ps = cn.prepareStatement(sql);
         try {
@@ -423,20 +439,27 @@ public class DaoPer {
         return tabla;
     }
 
-    public void guardarBaseDatos(BaseDatos bdAltas) throws SQLException {
+    public int guardarBaseDatos(BaseDatos bdAltas) throws SQLException {
+        int identity = 0;
         Connection cn = ds.getConnection();
         String sql = "INSERT INTO basesDeDatos (baseDeDatos, jndi) VALUES(?,?)";
+        String sqlIdentity = "SELECT @@IDENTITY as indentidad";
         PreparedStatement ps = cn.prepareStatement(sql);
         ps.setString(1, bdAltas.getBaseDatos());
         ps.setString(2, bdAltas.getJndi());
         try {
-            ps.executeQuery();
+            ps.executeUpdate();
+            ps = cn.prepareStatement(sqlIdentity);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                identity = rs.getInt("indentidad");
+            }
         } catch (Exception e) {
             System.err.println(e);
         } finally {
             cn.close();
         }
-
+        return identity;
     }
 
     public void insertarAcceso(int idUsuario, int idBd, int idPerfil) throws SQLException {
@@ -451,6 +474,96 @@ public class DaoPer {
         } catch (Exception e) {
             System.err.println(e);
         }
+    }
 
+    public void actualizarBaseDatos(BaseDatos bdAltas) throws SQLException {
+        String sql = "UPDATE basesDeDatos set baseDeDatos='"
+                + bdAltas.getBaseDatos() + "', jndi ='" + bdAltas.getJndi()
+                + "' WHERE idBaseDeDatos =" + bdAltas.getIdBaseDatos();
+        Connection cn = ds.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+            ps.close();
+        }
+    }
+
+    public void ActualizarPerfiles(Perfiles perfil) throws SQLException {
+        String sql = "UPDATE perfiles set perfil ='" + perfil.getPerfil() + "' WHERE idPerfil=" + perfil.getIdPerfiles();
+        Connection cn = ds.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+            ps.close();
+        }
+
+    }
+
+    public void ActualizarModulos(Modulo m) throws SQLException {
+        String sql = "UPDATE modulos set modulo='" + m.getModulo() + "' WHERE idModulo=" + m.getIdModulo();
+        Connection cn = ds.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+            ps.close();
+        }
+    }
+
+    public ArrayList<BaseDatos> dameListaBds() throws SQLException {
+        ArrayList<BaseDatos> lista = new ArrayList<BaseDatos>();
+        Connection cn = null;
+        cn = ds.getConnection();
+        try {
+            Statement preparedStatement = cn.createStatement();
+            ResultSet cursorBases = preparedStatement.executeQuery("exec sp_databases");
+            int id = 1;
+            while (cursorBases.next()) {
+                BaseDatos bds = new BaseDatos();
+                bds.setIdBaseDatos(id);
+                bds.setBaseDatos(cursorBases.getString("DATABASE_NAME"));
+                lista.add(bds);
+                id++;
+            }
+        } catch (SQLException e) {
+            cn.rollback();
+        } finally {
+            cn.close();
+        }
+        return lista;
+    }
+
+    public void insertarBd(ArrayList<BaseDatos> bd) throws SQLException {
+        Connection cn = ds.getConnection();
+        String sql = "INSERT INTO basesDeDatos (baseDeDatos, jndi) VALUES (?,?)";
+        String sqlTruncar = "truncate table basesDeDatos";
+        PreparedStatement ps;
+        ps = cn.prepareStatement(sqlTruncar);
+        ps.executeUpdate();
+        ps = cn.prepareStatement(sql);
+        try {
+            for (int i = 0; i < bd.size(); i++) {
+                String jndi = "jdbc/__" + bd.get(i).getBaseDatos();
+                ps.setString(1, bd.get(i).getBaseDatos());
+                ps.setString(2, jndi);
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+            ps.close();
+        }
     }
 }

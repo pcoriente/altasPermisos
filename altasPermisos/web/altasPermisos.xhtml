@@ -11,74 +11,79 @@
         <h:form>
             <div style="width: 950px; margin: auto">
                 <h:graphicImage  library="images" name="encabezado.jpg" /> 
-                <p:panel header="Altas" >
-                    <p:commandButton value="BdS" onclick="sql.show();"/>
-                    <p:commandButton id="btnBds"  value="Perfil" onclick="perfil.show();"/>
-                    <p:commandButton id="btnUsuarios" value="Usuarios" disabled="#{mbUsuarios.bd.idBaseDatos==0 || mbUsuarios.perfil2.idPerfiles==0}" onclick="dlg.show();"/>
-                    <p:commandButton id="btnModulos" value="Modulo"  onclick="modulo.show();"/>
-                    <p:commandButton id="btnAcciones" value="Acciones" disabled="#{mbUsuarios.modulo.idModulo == 0}" onclick="acciones.show();"/>
-                    <br></br>
-                    <br></br>
-                    <br></br>
-                    <p:outputLabel>Base de Datos.</p:outputLabel>
-                    <p:selectOneMenu id="listaBd" style="width: 230px" 
-                                     value="#{mbUsuarios.bd}">
-                        <f:selectItems value="#{mbUsuarios.listaBaseDatos}"/>
-                        <f:converter converterId="traerBd"/>
-                        <p:ajax listener="#{mbUsuarios.dameModulosAcciones()}"
-                                event="change" 
-                                update="PickAcciones  btnUsuarios"
-                                process="@this listaPerfiles modulos"/>
-                    </p:selectOneMenu>
-                    <h:panelGrid columns="2">
-                        <p:outputLabel> Perfiles.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
-                        <p:selectOneMenu  
-                            id="listaPerfiles" style="width: 230px"
-                            value="#{mbUsuarios.perfil2}">
-                            <f:selectItems value="#{mbUsuarios.listaPerfiles}" />
-                            <f:converter converterId="traerPerfil"/>
-                            <p:ajax listener="#{mbUsuarios.dameModulosAcciones()}"
-                                    event="change" 
-                                    update="PickAcciones btnUsuarios"
-                                    process="@this modulos listaBd"/>
-                        </p:selectOneMenu>
-                        <p:outputLabel>Modulo.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
-                        <p:selectOneMenu 
-                            id="modulos" 
-                            style="width: 230px"
-                            value="#{mbUsuarios.modulo}">
-                            <f:selectItems value="#{mbUsuarios.listaModulos}"/>
-                            <f:converter converterId="traerModulos"/>
-                            <p:ajax listener="#{mbUsuarios.dameModulosAcciones()}"
-                                    event="change" 
-                                    update="PickAcciones btnAcciones "
-                                    process="@this listaPerfiles listaBd"/>
-                        </p:selectOneMenu>
+                <center>
+                    <p:panel header="Panel de Administración" style="width: 700px" >
+                        <h:panelGrid columns="5">
+                            <p:commandButton value="Bases de Datos" style="width: 120px; height: 60px" onclick="agregarBds.show();"/>
+                            <p:commandButton id="btnPerfil"  value="Perfiles" style="width: 120px; height: 58px" onclick="perfil.show();"/>
+                            <p:commandButton id="btnUsuarios" value="Usuarios"  style="width: 120px; height: 58px" disabled="#{mbUsuarios.bd.idBaseDatos==0 || mbUsuarios.perfil2.idPerfiles==0}" onclick="dlg.show();"/>
+                            <p:commandButton id="btnModulos" value="Módulos" style="width: 120px; height: 58px" onclick="modulo.show();"/>
+                            <p:commandButton id="btnAcciones" value="Acciones" style="width: 120px; height: 58px" disabled="#{mbUsuarios.modulo.idModulo == 0}" onclick="acciones.show();"/>
+                        </h:panelGrid>
+                        <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />  
+                        <br></br>
+                        <h:panelGrid columns="2">
+                            <p:outputLabel>Base de Datos:</p:outputLabel>
+                            <p:selectOneMenu id="listaBd" style="width: 230px" 
+                                             value="#{mbUsuarios.bd}">
+                                <f:selectItems value="#{mbUsuarios.listaBaseDatos}"/>
+                                <f:converter converterId="traerBd"/>
+                                <p:ajax listener="#{mbUsuarios.dameModulosAcciones(0)}"
+                                        event="change" 
+                                        update="PickAcciones  btnUsuarios btnGuardar"
+                                        process="@this listaPerfiles modulos"/>
 
-                    </h:panelGrid>
-                    <p:pickList  
-                        id="PickAcciones"
-                        style="width: 200px"
-                        effect="slide"
-                        value="#{mbUsuarios.pickAcciones}"
-                        var="ListaModulos"
-                        itemLabel="#{ListaModulos}"
-                        itemValue="#{ListaModulos}">
-                        <f:converter converterId="traerAcciones"/>
-                    </p:pickList>
-                    <p:commandButton 
-                        value="Guardar"
-                        action="#{mbUsuarios.dameValoresCmb()}"
-                        icon="ui-icon-disk"
-                        />
-                    <p:commandButton 
-                        value="Cancelar"
-                        action="#{mbUsuarios.cancelarUsuarioPerfil()}"
-                        update="modulos listaPerfiles listaBd PickAcciones"
-                        icon="ui-icon-cancel"
-                        />
-                </p:panel>
-                <p:dialog modal="true" header="Altas Usuarios" widgetVar="dlg" hideEffect="explode">
+                            </p:selectOneMenu>
+                            <p:outputLabel> Perfiles:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
+                            <p:selectOneMenu  
+                                id="listaPerfiles" style="width: 230px"
+                                value="#{mbUsuarios.perfil2}">
+                                <f:selectItems value="#{mbUsuarios.listaPerfiles}" />
+                                <f:converter converterId="traerPerfil"/>
+                                <p:ajax listener="#{mbUsuarios.dameModulosAcciones(0)}"
+                                        event="change" 
+                                        update="PickAcciones btnUsuarios btnGuardar nombrePerfil"
+                                        process="@this modulos listaBd"/>
+                            </p:selectOneMenu>
+                            <p:outputLabel>Modulo:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
+                            <p:selectOneMenu 
+                                id="modulos" 
+                                style="width: 230px"
+                                value="#{mbUsuarios.modulo}">
+                                <f:selectItems value="#{mbUsuarios.listaModulos}"/>
+                                <f:converter converterId="traerModulos"/>
+                                <p:ajax listener="#{mbUsuarios.dameModulosAcciones(0)}"
+                                        event="change" 
+                                        update="PickAcciones btnAcciones btnUsuarios btnPerfil btnGuardar Modulo"
+                                        process="@this listaPerfiles listaBd"/>
+                            </p:selectOneMenu>
+
+                        </h:panelGrid>
+                        <p:pickList  
+                            id="PickAcciones"
+                            style="width: 200px"
+                            effect="slide"
+                            value="#{mbUsuarios.pickAcciones}"
+                            var="ListaAcciones"
+                            itemLabel="#{ListaAcciones}"
+                            itemValue="#{ListaAcciones}">
+                            <f:converter converterId="traerAcciones"/>
+                        </p:pickList>
+                        <p:commandButton 
+                            id="btnGuardar"
+                            value="Guardar"
+                            action="#{mbUsuarios.guardarValores()}"
+                            icon="ui-icon-disk"
+                            />
+                        <p:commandButton
+                            value="Cancelar"
+                            action="#{mbUsuarios.cancelarUsuarioPerfil()}"
+                            update="modulos listaPerfiles listaBd PickAcciones btnUsuarios btnAcciones"
+                            icon="ui-icon-cancel"
+                            />
+                    </p:panel>
+                </center>
+                <p:dialog modal="true" header="Altas de Usuarios" widgetVar="dlg" hideEffect="explode">
                     <br></br>
                     <h:panelGrid columns="2">
                         <p:outputLabel value="Usuario"/>
@@ -90,43 +95,41 @@
                         <p:outputLabel value="Correo"/>
                         <p:inputText  style="width:150px" id="correo"  value="#{mbUsuarios.u.email}"/>
                     </h:panelGrid>
-                    <center>
-                        <p:commandButton 
-                            value="Guardar"
-                            icon="ui-icon-disk"
-                            action="#{mbUsuarios.insertarDatos()}"
-                            oncomplete="dlg.hide();"
-                            update="usuario login password correo"
-                            />
-                    </center>
+                    <p:commandButton 
+                        value="Guardar"
+                        icon="ui-icon-disk"
+                        action="#{mbUsuarios.insertarDatos()}"
+                        oncomplete="dlg.hide();"
+                        update="usuario login password correo"
+                        />
                 </p:dialog>
-                <p:dialog  modal="true" header="Altas Modulos" widgetVar="modulo" hideEffect="explode">
+                <p:dialog  modal="true" header="Altas de Modulos" widgetVar="modulo" hideEffect="explode">
                     <br></br>
                     <h:panelGrid columns="2">
                         <p:outputLabel value="Modulo"/>
                         <p:inputText style="width: 150px" id="Modulo" value="#{mbUsuarios.m.modulo}"/>
                     </h:panelGrid>
-                    <center>
-                        <p:commandButton 
-                            icon="ui-icon-disk"
-                            value="Guardar"
-                            action="#{mbUsuarios.guardarModulo()}"
-                            update="modulos Modulo"
-                            oncomplete="modulo.hide();"
-                            />
-                    </center>
+
+                    <p:commandButton 
+                        icon="ui-icon-disk"
+                        value="Guardar"
+                        action="#{mbUsuarios.guardarModulo()}"
+                        update="modulos Modulo btnAcciones"
+                        oncomplete="modulo.hide();"
+                        />
                 </p:dialog>
-                <p:dialog  modal="true" header="Perfiles" widgetVar="perfil" hideEffect="explode">
+                <p:dialog  modal="true" header="Altas de Perfiles" widgetVar="perfil" hideEffect="explode">
                     <h:panelGrid columns="2">
                         <p:outputLabel value="Perfil"/>
                         <p:inputText id="nombrePerfil" value="#{mbUsuarios.perfil.perfil}"/>
                     </h:panelGrid>
                     <p:commandButton value="Guardar" 
+                                     icon="ui-icon-disk"
                                      action="#{mbUsuarios.guardarPerfil()}"
-                                     update="listaPerfiles nombrePerfil"
+                                     update="listaPerfiles nombrePerfil btnUsuarios PickAcciones"
                                      oncomplete="perfil.hide();"/>
                 </p:dialog>
-                <p:dialog  modal="true" header="Acciones" widgetVar="acciones" hideEffect="explode" >
+                <p:dialog  modal="true" header="Acciones del Modulo" widgetVar="acciones" hideEffect="explode" >
                     <h:panelGrid columns="2">
                         <p:outputLabel value="Accion"/>
                         <p:inputText id="accion" value="#{mbUsuarios.acciones.accion}" />
@@ -135,29 +138,32 @@
                     </h:panelGrid>
                     <p:commandButton   value="Guardar" 
                                        icon="ui-icon-disk"
+                                       
                                        action="#{mbUsuarios.guardarAcciones()}"
-                                       update="accion idBoton "
+                                       update="accion idBoton PickAcciones"
                                        oncomplete="acciones.hide();"/>
                 </p:dialog>
-                <p:dialog  modal="true" header="Base de Datos Sql"
-                           widgetVar="sql"
+                <p:dialog  modal="true" header="Base de Datos Del Servidor"
+                           widgetVar="agregarBds"
                            hideEffect="explode"
                            >
-                    <h:panelGrid id="DatosBds" columns="2">
-                        <p:outputLabel value="Base de Datos"/>
-                        <p:inputText id="bdAltas" 
-                                     value="#{mbUsuarios.bdAltas.baseDatos}"/>
-                        <p:outputLabel  value="Jndi"/>
-                        <p:inputText id="jndiAltas"
-                                     value="#{mbUsuarios.bdAltas.jndi}"/>
-                    </h:panelGrid>
-                    <center>
-                        <p:commandButton   value="Guardar" 
-                                           icon="ui-icon-disk"
-                                           action="#{mbUsuarios.guardarBds()}"
-                                           update="bdAltas jndiAltas listaBd"
-                                           oncomplete="sql.hide();"/>
-                    </center>
+                    <p:messages id="mssgGrupos" showDetail="true" autoUpdate="true" closable="true" />
+                    <p:pickList  
+                        id="PickModulos"
+                        style="width: 200px"
+                        effect="slide"
+                        value="#{mbUsuarios.pickBd}"
+                        var="pickBd"
+                        itemLabel="#{pickBd}"
+                        itemValue="#{pickBd}">
+                        <f:converter converterId="traerBdsPickList"/>
+                    </p:pickList>
+                    <p:commandButton value="Guardar"
+                                     icon="ui-icon-disk"
+                                     actionListener="#{mbUsuarios.dameBdsPickList()}"
+                                     update="listaBd"
+                                     oncomplete="agregarBds.hide();"
+                                     />
                 </p:dialog>
             </div>
         </h:form>

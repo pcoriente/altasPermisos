@@ -16,6 +16,13 @@
         <converter-class>converterPermisos.ConverterAcciones</converter-class>
     </converter>
     
+    
+     <converter>
+        <converter-id>traerBdsPickList</converter-id>
+        <converter-class>converterPermisos.ConverterPickBds</converter-class>
+    </converter>
+    
+    
     <converter>
         <converter-id>traerBd</converter-id>
         <converter-class>converterPermisos.ConverterBd</converter-class>

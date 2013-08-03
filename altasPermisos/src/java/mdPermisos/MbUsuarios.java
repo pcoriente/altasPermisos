@@ -23,6 +23,7 @@ import javax.faces.bean.RequestScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
+import javax.xml.bind.ParseConversionEvent;
 import org.primefaces.event.CloseEvent;
 import org.primefaces.model.DualListModel;
 import utilerias.Utilerias;
@@ -64,6 +65,54 @@ public class MbUsuarios {
     DualListModel<Acciones> pickAcciones = new DualListModel<Acciones>();
     ArrayList<Acciones> accionesOrigen = new ArrayList<Acciones>();
     ArrayList<Acciones> accionesDestino = new ArrayList<Acciones>();
+    DualListModel<BaseDatos> pickBd = new DualListModel<BaseDatos>();
+    ArrayList<BaseDatos> DestinoBd = new ArrayList<BaseDatos>();
+    ArrayList<BaseDatos> OrigenBd = new ArrayList<BaseDatos>();
+
+    public DualListModel<BaseDatos> getPickBd() throws SQLException {
+        ArrayList<BaseDatos> a1 = new ArrayList<BaseDatos>();
+        ArrayList<BaseDatos> a2 = new ArrayList<BaseDatos>();
+        DaoPer daoPermisos = new DaoPer();
+        a1 = daoPermisos.dameListaBds();
+        a2 = daoPermisos.dameBaseDatos();
+//      a1.remove(1);
+        for (int x = 0; x < a1.size(); x++) {
+            for (int y = 0; y < a2.size(); y++) {
+                BaseDatos b = new BaseDatos();
+                BaseDatos b2 = new BaseDatos();
+                b.setBaseDatos(a1.get(x).getBaseDatos());
+                b2.setBaseDatos(a2.get(y).getBaseDatos());
+                if (a1.get(x).getBaseDatos().equals(a2.get(y).getBaseDatos())) {
+                    a1.remove(x);
+                    x--;
+                    break;
+                }
+            }
+        }
+        pickBd = new DualListModel<>(a1, a2);
+        return pickBd;
+    }
+
+    public void setPickBd(DualListModel<BaseDatos> pickBd) {
+        this.pickBd = pickBd;
+    }
+
+    public ArrayList<BaseDatos> getDestinoBd() {
+        return DestinoBd;
+    }
+
+    public void setDestinoBd(ArrayList<BaseDatos> DestinoBd) {
+        this.DestinoBd = DestinoBd;
+    }
+
+    public ArrayList<BaseDatos> getOrigenBd() throws SQLException {
+
+        return OrigenBd;
+    }
+
+    public void setOrigenBd(ArrayList<BaseDatos> OrigenBd) {
+        this.OrigenBd = OrigenBd;
+    }
 
     public BaseDatos getBdAltas() {
         return bdAltas;
@@ -89,9 +138,10 @@ public class MbUsuarios {
         this.accionesDestino = accionesDestino;
     }
 
-    public DualListModel<Acciones> getPickAcciones() {
+    public DualListModel<Acciones> getPickAcciones() throws SQLException {
         pickAcciones = new DualListModel<Acciones>(accionesOrigen, accionesDestino);
         return pickAcciones;
+        
     }
 
     public void setPickAcciones(DualListModel<Acciones> pickAcciones) {
@@ -327,9 +377,15 @@ public class MbUsuarios {
 
     public void guardarModulo() throws SQLException {
         DaoPer daoPer = new DaoPer();
-        daoPer.guardarModulo(m);
-        m = new Modulo();
-
+        if (modulo.getIdModulo() != 0) {
+            m.getModulo();
+            m.setIdModulo(modulo.getIdModulo());
+            daoPer.ActualizarModulos(m);
+        } else {
+            int identity = daoPer.guardarModulo(m);
+            modulo.setIdModulo(identity);
+            modulo.setModulo(m.getModulo());
+        }
     }
 
     private List<SelectItem> dameModulos() throws SQLException {
@@ -348,10 +404,10 @@ public class MbUsuarios {
         return Modulos;
     }
 
-    public void dameValoresCmb() throws SQLException {
+    public void guardarValores() throws SQLException {
 
-        if (bd.getIdBaseDatos() == 0) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:", "Seleccione una Base de Datos"));
+        if (bd.getIdBaseDatos() == 0 && perfil2.getIdUsuario() == 0 && modulo.getIdModulo() == 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:", "Seleccione todas las Opciones"));
         } else {
 
             perfil2.getIdUsuario();
@@ -363,21 +419,23 @@ public class MbUsuarios {
             usuaPerfil.setIdPerfil(perfil2.getIdPerfiles());
             usuaPerfil.setIdModulo(modulo.getIdModulo());
             mPrueba = (ArrayList<Modulo>) pickModulos.getSource();
-            if (usuaPerfil.getIdAccion() != 0 && usuaPerfil.getIdModulo() != 0 && usuaPerfil.getIdPerfil() != 0) {
+            if (usuaPerfil.getIdModulo() != 0 && usuaPerfil.getIdPerfil() != 0) {
                 daoPermisos.insertarUsuarioPerfil(usuaPerfil, acciones);
                 m2.setIdModulo(0);
                 perfil2.setIdPerfiles(0);
                 bd.setIdBaseDatos(0);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Se insertaron los datos Correctamente"));
             }
 
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Se insertaron los datos Correctamente"));
+
         }
     }
 
     public void guardarAcciones() throws SQLException {
         DaoPer daoPermisos = new DaoPer();
-        acciones.setIdAccion(modulo.getIdModulo());
+        acciones.setIdMOdulo(modulo.getIdModulo());
         daoPermisos.insertarAcciones(acciones);
+        dameModulosAcciones(0);
         eliminarAcciones();
     }
 
@@ -410,10 +468,19 @@ public class MbUsuarios {
 
     public void guardarPerfil() throws SQLException {
         DaoPer daoPer = new DaoPer();
-        u2.getIdUsuario();
-        perfil.setIdUsuario(u2.getIdUsuario());
-        daoPer.insertarPerfil(perfil);
-        perfil = new Perfiles();
+        if (perfil2.getIdPerfiles() != 0) {
+            perfil.getPerfil();
+            perfil.setIdPerfiles(perfil2.getIdPerfiles());
+            daoPer.ActualizarPerfiles(perfil);
+        } else {
+            u2.getIdUsuario();
+            perfil.setIdUsuario(u2.getIdUsuario());
+            int identity = daoPer.insertarPerfil(perfil);
+            dameModulosAcciones(identity);
+            perfil2.setIdPerfiles(identity);
+            perfil2.setPerfil(perfil.getPerfil());
+//          perfil = new Perfiles();
+        }
     }
 
     private List<SelectItem> damePerfiles() throws SQLException {
@@ -455,20 +522,38 @@ public class MbUsuarios {
         return ListAcciones;
     }
 
-    public void dameModulosAcciones() throws SQLException {
-
+    public void dameModulosAcciones(int id) throws SQLException {
+        if (bd.getIdBaseDatos() != 0) {
+            bdAltas.setBaseDatos(bd.getBaseDatos());
+            bdAltas.setIdBaseDatos(bd.getIdBaseDatos());
+            bdAltas.setJndi(bd.getJndi());
+        }
+        if (perfil2.getIdPerfiles() != 0) {
+            perfil.setIdPerfiles(perfil2.getIdPerfiles());
+            perfil.setPerfil(perfil2.getPerfil());
+        }
+        if (modulo.getIdModulo() != 0) {
+            m.setModulo(modulo.getModulo());
+        }
         String nomBd = bd.getBaseDatos();
-        int idPerfil = perfil2.getIdPerfiles();
+         int idPerfil =0;
+        if(id>0){
+            idPerfil=id;
+        }
+        else{
+            idPerfil= perfil2.getIdPerfiles();
+        }
         int idModulo = modulo.getIdModulo();
-
-        DaoPer daoPermisos = new DaoPer();
-        ArrayList<Acciones> acciones = new ArrayList<Acciones>();
-        acciones = daoPermisos.dameValores(nomBd, idModulo, idPerfil);
-        for (Acciones ac : acciones) {
-            if (ac.getIdPerfil() == 0) {
-                accionesOrigen.add(ac);
-            } else {
-                accionesDestino.add(ac);
+        if (idPerfil != 0 && idModulo != 0 && nomBd != null) {
+            DaoPer daoPermisos = new DaoPer();
+            ArrayList<Acciones> acciones = new ArrayList<Acciones>();
+            acciones = daoPermisos.dameValores(nomBd, idModulo, idPerfil);
+            for (Acciones ac : acciones) {
+                if (ac.getIdPerfil() == 0) {
+                    accionesOrigen.add(ac);
+                } else {
+                    accionesDestino.add(ac);
+                }
             }
         }
     }
@@ -480,9 +565,17 @@ public class MbUsuarios {
 
     public void guardarBds() throws SQLException {
         DaoPer daoPermisos = new DaoPer();
-        daoPermisos.guardarBaseDatos(bdAltas);
-        bdAltas.setBaseDatos("");
-        bdAltas.setJndi("");
+        if (bd.getIdBaseDatos() != 0) {
+            bdAltas.getBaseDatos();
+            bdAltas.setIdBaseDatos(bd.getIdBaseDatos());
+            bdAltas.getJndi();
+            daoPermisos.actualizarBaseDatos(bdAltas);
+        } else {
+            int identyti = daoPermisos.guardarBaseDatos(bdAltas);
+            bd.setBaseDatos(bdAltas.getBaseDatos());
+            bd.setIdBaseDatos(identyti);
+            bd.setJndi(bdAltas.getJndi());
+        }
 
     }
 
@@ -490,5 +583,25 @@ public class MbUsuarios {
         bd = new BaseDatos();
         perfil2 = new Perfiles();
         modulo = new Modulo();
+    }
+
+    public void guardarBd() {
+        ArrayList<BaseDatos> bd = (ArrayList<BaseDatos>) pickBd.getTarget();
+        bd.size();
+    }
+
+    public void dameBdsPickList() throws SQLException {
+//        FacesMessage fMsg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Aviso:", "");
+//        fMsg.setDetail("Se requiere un grupo !!");
+//        FacesContext.getCurrentInstance().addMessage(null, fMsg);
+        ArrayList<BaseDatos> bd = new ArrayList<BaseDatos>();
+        if (bd.size() >0) {
+
+        } else {
+            bd = (ArrayList<BaseDatos>) pickBd.getTarget();
+            DaoPer p = new DaoPer();
+            p.insertarBd(bd);
+        }
+
     }
 }
