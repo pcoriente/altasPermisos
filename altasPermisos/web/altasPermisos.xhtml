@@ -10,17 +10,20 @@
     <h:body>
         <h:form>
             <div style="width: 950px; margin: auto">
+
                 <h:graphicImage  library="images" name="encabezado.jpg" /> 
                 <center>
                     <p:panel header="Panel de Administración" style="width: 700px" >
+                        <p:growl id="growl" showDetail="true" life="2000" />  
                         <h:panelGrid columns="5">
                             <p:commandButton value="Bases de Datos" style="width: 120px; height: 60px" onclick="agregarBds.show();"/>
                             <p:commandButton id="btnPerfil"  value="Perfiles" style="width: 120px; height: 58px" onclick="perfil.show();"/>
                             <p:commandButton id="btnUsuarios" value="Usuarios"  style="width: 120px; height: 58px" disabled="#{mbUsuarios.bd.idBaseDatos==0 || mbUsuarios.perfil2.idPerfiles==0}" onclick="dlg.show();"/>
                             <p:commandButton id="btnModulos" value="Módulos" style="width: 120px; height: 58px" onclick="modulo.show();"/>
                             <p:commandButton id="btnAcciones" value="Acciones" style="width: 120px; height: 58px" disabled="#{mbUsuarios.modulo.idModulo == 0}" onclick="acciones.show();"/>
+                            <p:commandButton id="btnUsuariosMto" value="Mtto. Usuarios" style="width: 120px; height: 58px" onclick="acciones.show();"/>
                         </h:panelGrid>
-                        <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />  
+                        <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true"/>  
                         <br></br>
                         <h:panelGrid columns="2">
                             <p:outputLabel>Base de Datos:</p:outputLabel>
@@ -42,7 +45,7 @@
                                 <f:converter converterId="traerPerfil"/>
                                 <p:ajax listener="#{mbUsuarios.dameModulosAcciones(0)}"
                                         event="change" 
-                                        update="PickAcciones btnUsuarios btnGuardar nombrePerfil"
+                                        update="PickAcciones btnUsuarios btnGuardar nombrePerfil perfilNom"
                                         process="@this modulos listaBd"/>
                             </p:selectOneMenu>
                             <p:outputLabel>Modulo:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p:outputLabel>
@@ -86,21 +89,28 @@
                 <p:dialog modal="true" header="Altas de Usuarios" widgetVar="dlg" hideEffect="explode">
                     <br></br>
                     <h:panelGrid columns="2">
+                        <p:outputLabel value="Perfil"/>
+                        <p:outputLabel  id="perfilNom" value="#{mbUsuarios.perfil2.perfil}"/>
                         <p:outputLabel value="Usuario"/>
                         <p:inputText  style="width: 150px" id="usuario" value="#{mbUsuarios.u.usuario}"/>
                         <p:outputLabel value="Login"/>
                         <p:inputText style="width: 150px" id="login" value="#{mbUsuarios.u.login}"/>
                         <p:outputLabel value="Password"/>
                         <p:password  style="width: 150px" id="password" value="#{mbUsuarios.u.password}"/>
-                        <p:outputLabel value="Correo"/>
-                        <p:inputText  style="width:150px" id="correo"  value="#{mbUsuarios.u.email}"/>
+                        <p:outputLabel value="Correo" />
+                        <p:inputText  style="width:150px" id="correo"  value="#{mbUsuarios.u.email}">
+                        </p:inputText>
                     </h:panelGrid>
+                    <p:ajax event="close" 
+                            listener="#{mbUsuarios.elimanarUsuariosClose(event)}"
+                            update="usuario login password correo"
+                            process="@this"/>
                     <p:commandButton 
                         value="Guardar"
                         icon="ui-icon-disk"
                         action="#{mbUsuarios.insertarDatos()}"
-                        oncomplete="dlg.hide();"
-                        update="usuario login password correo"
+                        oncomplete="altasUsuarios(xhr, status, args);"
+                        update="usuario login password correo growl"
                         />
                 </p:dialog>
                 <p:dialog  modal="true" header="Altas de Modulos" widgetVar="modulo" hideEffect="explode">
@@ -109,13 +119,16 @@
                         <p:outputLabel value="Modulo"/>
                         <p:inputText style="width: 150px" id="Modulo" value="#{mbUsuarios.m.modulo}"/>
                     </h:panelGrid>
-
+                    <p:ajax event="close" 
+                            listener="#{mbUsuarios.elimanarModulosClose(event)}"
+                            update="Modulo"
+                            process="@this"/>
                     <p:commandButton 
                         icon="ui-icon-disk"
                         value="Guardar"
                         action="#{mbUsuarios.guardarModulo()}"
-                        update="modulos Modulo btnAcciones"
-                        oncomplete="modulo.hide();"
+                        update="growl modulos Modulo btnAcciones"
+                        oncomplete="altasModulo(xhr, status, args);"
                         />
                 </p:dialog>
                 <p:dialog  modal="true" header="Altas de Perfiles" widgetVar="perfil" hideEffect="explode">
@@ -126,10 +139,19 @@
                     <p:commandButton value="Guardar" 
                                      icon="ui-icon-disk"
                                      action="#{mbUsuarios.guardarPerfil()}"
-                                     update="listaPerfiles nombrePerfil btnUsuarios PickAcciones"
-                                     oncomplete="perfil.hide();"/>
+                                     update="growl listaPerfiles nombrePerfil btnUsuarios PickAcciones"
+                                     oncomplete="altasPerfiles(xhr, status, args);"/>
+                    <p:ajax event="close" 
+                            listener="#{mbUsuarios.elimanarAltasUsuariosClose(event)}"
+                            update="nombrePerfil"
+                            process="@this"/>
                 </p:dialog>
-                <p:dialog  modal="true" header="Acciones del Modulo" widgetVar="acciones" hideEffect="explode" >
+                <p:dialog  modal="true" 
+                           header="Acciones del Modulo"
+                           widgetVar="acciones" 
+                           hideEffect="explode"
+                           >
+
                     <h:panelGrid columns="2">
                         <p:outputLabel value="Accion"/>
                         <p:inputText id="accion" value="#{mbUsuarios.acciones.accion}" />
@@ -138,16 +160,19 @@
                     </h:panelGrid>
                     <p:commandButton   value="Guardar" 
                                        icon="ui-icon-disk"
-                                       
-                                       action="#{mbUsuarios.guardarAcciones()}"
-                                       update="accion idBoton PickAcciones"
-                                       oncomplete="acciones.hide();"/>
+                                       actionListener="#{mbUsuarios.guardarAcciones()}"
+                                       update="PickAcciones accion idBoton  growl"
+                                       oncomplete="altasAcciones(xhr, status, args);"/>
+                    <p:ajax event="close" 
+                            listener="#{mbUsuarios.elimianarAccionesModulos(event)}"
+                            update="accion idBoton"
+                            process="@this"/>
+
                 </p:dialog>
                 <p:dialog  modal="true" header="Base de Datos Del Servidor"
                            widgetVar="agregarBds"
-                           hideEffect="explode"
-                           >
-                    <p:messages id="mssgGrupos" showDetail="true" autoUpdate="true" closable="true" />
+                           hideEffect="explode">
+
                     <p:pickList  
                         id="PickModulos"
                         style="width: 200px"
@@ -161,12 +186,54 @@
                     <p:commandButton value="Guardar"
                                      icon="ui-icon-disk"
                                      actionListener="#{mbUsuarios.dameBdsPickList()}"
-                                     update="listaBd"
-                                     oncomplete="agregarBds.hide();"
+                                     update="growl listaBd"
+                                     oncomplete="altasBds(xhr, status, args);"
                                      />
                 </p:dialog>
             </div>
         </h:form>
+        <script type="text/javascript">
+                                function altasAcciones(xhr, status, args) {
+                                    if (args.validationFailed || !args.loggedIn) {
+                                        acciones.jq.effect("shake", {times: 5}, 100);
+                                    }
+                                    else {
+                                        acciones.hide();
+                                    }
+                                }
+                                function altasBds(xhr, status, args) {
+                                    agregarBds.hide();
+                                }
+
+                                function altasPerfiles(xhr, status, args) {
+                                    if (args.validationFailed || !args.loggedIn) {
+                                        perfil.jq.effect("shake", {times: 5}, 100);
+                                    }
+                                    else {
+                                        perfil.hide();
+                                    }
+                                }
+                                function altasModulo(xhr, status, args) {
+                                    if (args.validationFailed || !args.loggedIn) {
+                                        modulo.jq.effect("shake", {times: 5}, 100);
+                                    }
+                                    else {
+                                        modulo.hide();
+                                    }
+
+                                }
+                                function altasUsuarios(xhr, status, args) {
+                                    if (args.validationFailed || !args.loggedIn) {
+                                        dlg.jq.effect("shake", {times: 5}, 100);
+                                    }
+                                    else {
+                                        dlg.hide();
+                                    }
+                                }
+
+
+        </script>
+
     </h:body>
 </html>
 

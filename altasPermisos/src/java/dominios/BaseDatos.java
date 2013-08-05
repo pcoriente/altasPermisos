@@ -4,11 +4,13 @@
  */
 package dominios;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Comodoro
  */
-public class BaseDatos {
+public class BaseDatos implements Serializable{
 
     private int idBaseDatos;
     private String baseDatos;

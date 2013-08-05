@@ -7,6 +7,8 @@ package utilerias;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.security.MessageDigest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -41,5 +43,13 @@ public class Utilerias {
         }
         //clave encriptada
         return h.toString();
+    }
+
+    public boolean validarEmail(String email) {
+        boolean validar = false;
+        Pattern pattern = Pattern.compile("\\w+@\\w+\\.\\w+");
+        Matcher matcher = pattern.matcher(email);
+        validar = matcher.matches();
+        return validar;
     }
 }

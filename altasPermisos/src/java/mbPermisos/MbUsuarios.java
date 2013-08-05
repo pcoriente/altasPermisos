@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mdPermisos;
+package mbPermisos;
 
 import daoPermisos.DaoPer;
 import dominios.Acciones;
@@ -24,6 +24,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.xml.bind.ParseConversionEvent;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.CloseEvent;
 import org.primefaces.model.DualListModel;
 import utilerias.Utilerias;
@@ -89,7 +90,7 @@ public class MbUsuarios {
                 }
             }
         }
-        pickBd = new DualListModel<>(a1, a2);
+        pickBd = new DualListModel<BaseDatos>(a1, a2);
         return pickBd;
     }
 
@@ -141,7 +142,7 @@ public class MbUsuarios {
     public DualListModel<Acciones> getPickAcciones() throws SQLException {
         pickAcciones = new DualListModel<Acciones>(accionesOrigen, accionesDestino);
         return pickAcciones;
-        
+
     }
 
     public void setPickAcciones(DualListModel<Acciones> pickAcciones) {
@@ -367,25 +368,58 @@ public class MbUsuarios {
 
     public void insertarDatos() throws SQLException, Exception {
         DaoPer daoUsuario = new DaoPer();
+        RequestContext context = RequestContext.getCurrentInstance();
+        FacesMessage msg = null;
+        boolean loggedIn = false;
+        boolean validarEmail = false;
         Utilerias utilerias = new Utilerias();
-        String fecha = utilerias.dameFecha();
-        daoUsuario.insertarUsuario(u, bd.getIdBaseDatos(), perfil2.getIdPerfiles());
-        bd.getIdBaseDatos();
-        perfil2.getIdPerfiles();
-        u = new DominioUsuarios();
+        if (u.getUsuario().equals("") && u.getLogin().equals("") && u.getPassword().equals("") && u.getEmail().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Llene todos los Campos");
+        } else {
+            validarEmail = utilerias.validarEmail(u.getEmail());
+            if (validarEmail == true) {
+                String fecha = utilerias.dameFecha();
+                daoUsuario.insertarUsuario(u, bd.getIdBaseDatos(), perfil2.getIdPerfiles());
+                bd.getIdBaseDatos();
+                perfil2.getIdPerfiles();
+                u = new DominioUsuarios();
+                loggedIn = true;
+                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Nuevo Usuario Disponible");
+            } else {
+                loggedIn = false;
+                msg = new FacesMessage(FacesMessage.SEVERITY_FATAL, "Error", "Ingrese un Email Valido");
+            }
+        }
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        context.addCallbackParam("loggedIn", loggedIn);
     }
 
     public void guardarModulo() throws SQLException {
         DaoPer daoPer = new DaoPer();
+        RequestContext context = RequestContext.getCurrentInstance();
+        FacesMessage msg = null;
+        boolean loggedIn = false;
         if (modulo.getIdModulo() != 0) {
             m.getModulo();
             m.setIdModulo(modulo.getIdModulo());
             daoPer.ActualizarModulos(m);
+            loggedIn = true;
+            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "El Modulo fue Actualizado Correctamente");
         } else {
-            int identity = daoPer.guardarModulo(m);
-            modulo.setIdModulo(identity);
-            modulo.setModulo(m.getModulo());
+            if (m.getModulo().equals("")) {
+                loggedIn = false;
+                msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Ingrese un Nombre de Modulo");
+            } else {
+                int identity = daoPer.guardarModulo(m);
+                loggedIn = true;
+                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Nuevo Modulo Disponible");
+                modulo.setIdModulo(identity);
+                modulo.setModulo(m.getModulo());
+            }
         }
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        context.addCallbackParam("loggedIn", loggedIn);
     }
 
     private List<SelectItem> dameModulos() throws SQLException {
@@ -432,22 +466,33 @@ public class MbUsuarios {
     }
 
     public void guardarAcciones() throws SQLException {
-        DaoPer daoPermisos = new DaoPer();
-        acciones.setIdMOdulo(modulo.getIdModulo());
-        daoPermisos.insertarAcciones(acciones);
-        dameModulosAcciones(0);
-        eliminarAcciones();
-    }
-
-    public void eliminarAcciones() {
-        acciones.setAccion(null);
-        acciones.setIdAccion(0);
-        acciones.setIdMOdulo(0);
-        acciones.setIdBoton(null);
-        acciones.setSta(false);
-        acciones.setStatus(0);
-        acciones.setStatus(0);
-        m3.setIdModulo(0);
+        RequestContext context = RequestContext.getCurrentInstance();
+        FacesMessage msg = null;
+        boolean loggedIn = false;
+        if (acciones.getAccion().equals("") && acciones.getIdBoton().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Ingrese una Accion y un IdButom");
+            dameModulosAcciones(0);
+        } else if (acciones.getIdBoton().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Ingrese el idBotom");
+            dameModulosAcciones(0);
+        } else if (acciones.getAccion().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Ingrese una Acción");
+            dameModulosAcciones(0);
+        } else {
+            loggedIn = true;
+            DaoPer daoPermisos = new DaoPer();
+            acciones.setIdMOdulo(modulo.getIdModulo());
+            daoPermisos.insertarAcciones(acciones);
+            dameModulosAcciones(0);
+            acciones = new Acciones();
+            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Nuevas Acciones Disponibles");
+//            RequestContext.getCurrentInstance().execute("dlg.hide();");
+        }
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        context.addCallbackParam("loggedIn", loggedIn);
     }
 
     private List<SelectItem> dameBd() throws SQLException {
@@ -468,19 +513,32 @@ public class MbUsuarios {
 
     public void guardarPerfil() throws SQLException {
         DaoPer daoPer = new DaoPer();
+        RequestContext context = RequestContext.getCurrentInstance();
+        FacesMessage msg = null;
+        boolean loggedIn = false;
         if (perfil2.getIdPerfiles() != 0) {
             perfil.getPerfil();
             perfil.setIdPerfiles(perfil2.getIdPerfiles());
             daoPer.ActualizarPerfiles(perfil);
+            loggedIn = true;
+            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Perfil Actualizado");
         } else {
-            u2.getIdUsuario();
-            perfil.setIdUsuario(u2.getIdUsuario());
-            int identity = daoPer.insertarPerfil(perfil);
-            dameModulosAcciones(identity);
-            perfil2.setIdPerfiles(identity);
-            perfil2.setPerfil(perfil.getPerfil());
-//          perfil = new Perfiles();
+            if (perfil.getPerfil().equals("")) {
+                loggedIn = false;
+                msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Ingrese un Nombre de Perfil");
+            } else {
+                u2.getIdUsuario();
+                perfil.setIdUsuario(u2.getIdUsuario());
+                int identity = daoPer.insertarPerfil(perfil);
+                dameModulosAcciones(identity);
+                perfil2.setIdPerfiles(identity);
+                perfil2.setPerfil(perfil.getPerfil());
+                loggedIn = true;
+                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Nuevo Perfil Disponible");
+            }
         }
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        context.addCallbackParam("loggedIn", loggedIn);
     }
 
     private List<SelectItem> damePerfiles() throws SQLException {
@@ -536,12 +594,11 @@ public class MbUsuarios {
             m.setModulo(modulo.getModulo());
         }
         String nomBd = bd.getBaseDatos();
-         int idPerfil =0;
-        if(id>0){
-            idPerfil=id;
-        }
-        else{
-            idPerfil= perfil2.getIdPerfiles();
+        int idPerfil = 0;
+        if (id > 0) {
+            idPerfil = id;
+        } else {
+            idPerfil = perfil2.getIdPerfiles();
         }
         int idModulo = modulo.getIdModulo();
         if (idPerfil != 0 && idModulo != 0 && nomBd != null) {
@@ -591,17 +648,40 @@ public class MbUsuarios {
     }
 
     public void dameBdsPickList() throws SQLException {
-//        FacesMessage fMsg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Aviso:", "");
-//        fMsg.setDetail("Se requiere un grupo !!");
-//        FacesContext.getCurrentInstance().addMessage(null, fMsg);
+        RequestContext context = RequestContext.getCurrentInstance();
+        FacesMessage msg = null;
+        boolean loggedIn;
         ArrayList<BaseDatos> bd = new ArrayList<BaseDatos>();
-        if (bd.size() >0) {
-
+        if (bd.size() > 0) {
         } else {
             bd = (ArrayList<BaseDatos>) pickBd.getTarget();
             DaoPer p = new DaoPer();
             p.insertarBd(bd);
+            if (pickBd.getTarget().size() == 0) {
+                loggedIn = true;
+                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Removido", "Las bases de Datos fueron removidas");
+            } else {
+                loggedIn = true;
+                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregadas", "Nuevas Bases de Datos disponibles");
+            }
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+            context.addCallbackParam("Bd´s", loggedIn);
         }
+    }
 
+    public void elimanarModulosClose(CloseEvent event) {
+        m = new Modulo();
+    }
+
+    public void elimanarUsuariosClose(CloseEvent event) {
+        u = new DominioUsuarios();
+    }
+
+    public void elimanarAltasUsuariosClose(CloseEvent event) {
+        perfil = new Perfiles();
+    }
+
+    public void elimianarAccionesModulos(CloseEvent event) {
+        acciones = new Acciones();
     }
 }

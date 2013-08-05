@@ -4,11 +4,13 @@
  */
 package dominios;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Comodoro
  */
-public class Acciones {
+public class Acciones implements Serializable {
 
     private int idAccion;
     private String accion;

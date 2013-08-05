@@ -7,6 +7,7 @@ package daoPermisos;
 import dominios.Acciones;
 import dominios.BaseDatos;
 import dominios.DominioUsuarios;
+import dominios.Login;
 import dominios.Modulo;
 import dominios.Perfiles;
 import dominios.TablaAcciones;
@@ -565,5 +566,17 @@ public class DaoPer {
             cn.close();
             ps.close();
         }
+    }
+
+    public boolean loguearme(Login log) throws SQLException {
+        boolean validado = false;
+        String sql = "SELECT * FROM tabla";
+        Connection cn = ds.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        if (rs.first() == true) {
+            validado = true;
+        }
+        return validado;
     }
 }
