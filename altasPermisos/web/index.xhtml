@@ -6,38 +6,30 @@
     <h:head>
         <title>ENTRADA AL BDS</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
-        <h:outputStylesheet library="css" name="main.css"/>
-        <h:outputStylesheet library="css" name="estilos.css"/>
-        <meta http-equiv="refresh" content="#{session.maxInactiveInterval};url=http://localhost:8080/LaAnita/" />
     </h:head>
-
     <body>
         <div id="wrapper" align="center">
             <div id="content" align="center"  >
                 <!--   CAMBIAR DE AQUI EN ADELANTE  -->
                 <div style="width: 960px">
                     <h:graphicImage  library="images" name="encabezado.jpg" />
-                    <p:panel header="CONTROL DE ACCESO: BASES DE DATOS" style="width: 60%;  ">
+                    <p:panel header="CONTROL DE ACCESO: PANEL ADMINISTRATIVO" style="width: 60%;  ">
                         <h:form>
-                            <h:messages layout="table" style="font-size: large; color: #A00F0F;"/>
-                            <h:panelGrid  columns="2" style="width: 95%;" >
-                                <h:outputText  value="Login: "  />
-                                <p:inputText id="login"
-                                             value="#{mbLogin.login.usuario}"
-                                             required="true"
-                                             requiredMessage="Teclea un nombre de usuario..." />
-                                <h:outputText  value="Password: " />
-                                <p:password   id="password"
-                                              value="#{mbLogin.login.usuario}"
-                                              required="true"
-                                              requiredMessage="Teclea un password..."
-                                              feedback="true" /> 
-                                <h:outputText  value="" />
-                                <p:commandButton id="boton"
-                                                 value="Acceder"
-                                                 action="#{mbLogin.validarLogin()}"
-                                                 ajax="false"/> 
-                            </h:panelGrid>
+                            <center> 
+                                <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />  
+                                <h:panelGrid  columns="2" style="width: 50%;" >
+                                    <h:outputText  value="Password: " />
+                                    <p:password   id="password"
+                                                  value="#{mbLogin.login.password}"
+                                                  feedback="true" /> 
+                                    <center>
+                                        <p:commandButton id="boton"
+                                                         value="Acceder"
+                                                         action="#{mbLogin.validarLogin()}"
+                                                         ajax="false"/>
+                                    </center>
+                                </h:panelGrid> 
+                            </center>
                         </h:form>
 
                     </p:panel>

@@ -10,18 +10,16 @@
     <h:body>
         <h:form>
             <div style="width: 950px; margin: auto">
-
                 <h:graphicImage  library="images" name="encabezado.jpg" /> 
                 <center>
                     <p:panel header="Panel de Administración" style="width: 700px" >
-                        <p:growl id="growl" showDetail="true" life="2000" />  
+                        <p:growl id="growl" showDetail="true" life="3000" />  
                         <h:panelGrid columns="5">
                             <p:commandButton value="Bases de Datos" style="width: 120px; height: 60px" onclick="agregarBds.show();"/>
                             <p:commandButton id="btnPerfil"  value="Perfiles" style="width: 120px; height: 58px" onclick="perfil.show();"/>
                             <p:commandButton id="btnUsuarios" value="Usuarios"  style="width: 120px; height: 58px" disabled="#{mbUsuarios.bd.idBaseDatos==0 || mbUsuarios.perfil2.idPerfiles==0}" onclick="dlg.show();"/>
                             <p:commandButton id="btnModulos" value="Módulos" style="width: 120px; height: 58px" onclick="modulo.show();"/>
                             <p:commandButton id="btnAcciones" value="Acciones" style="width: 120px; height: 58px" disabled="#{mbUsuarios.modulo.idModulo == 0}" onclick="acciones.show();"/>
-                            <p:commandButton id="btnUsuariosMto" value="Mtto. Usuarios" style="width: 120px; height: 58px" onclick="acciones.show();"/>
                         </h:panelGrid>
                         <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true"/>  
                         <br></br>
@@ -69,7 +67,11 @@
                             value="#{mbUsuarios.pickAcciones}"
                             var="ListaAcciones"
                             itemLabel="#{ListaAcciones}"
-                            itemValue="#{ListaAcciones}">
+                            itemValue="#{ListaAcciones}"
+                            showCheckbox="true"
+                            >
+                            <f:facet name="sourceCaption">Disponibles</f:facet>
+                            <f:facet name="targetCaption">Seleccionados</f:facet>
                             <f:converter converterId="traerAcciones"/>
                         </p:pickList>
                         <p:commandButton 
@@ -101,10 +103,6 @@
                         <p:inputText  style="width:150px" id="correo"  value="#{mbUsuarios.u.email}">
                         </p:inputText>
                     </h:panelGrid>
-                    <p:ajax event="close" 
-                            listener="#{mbUsuarios.elimanarUsuariosClose(event)}"
-                            update="usuario login password correo"
-                            process="@this"/>
                     <p:commandButton 
                         value="Guardar"
                         icon="ui-icon-disk"
@@ -119,10 +117,6 @@
                         <p:outputLabel value="Modulo"/>
                         <p:inputText style="width: 150px" id="Modulo" value="#{mbUsuarios.m.modulo}"/>
                     </h:panelGrid>
-                    <p:ajax event="close" 
-                            listener="#{mbUsuarios.elimanarModulosClose(event)}"
-                            update="Modulo"
-                            process="@this"/>
                     <p:commandButton 
                         icon="ui-icon-disk"
                         value="Guardar"
@@ -139,12 +133,8 @@
                     <p:commandButton value="Guardar" 
                                      icon="ui-icon-disk"
                                      action="#{mbUsuarios.guardarPerfil()}"
-                                     update="growl listaPerfiles nombrePerfil btnUsuarios PickAcciones"
+                                     update="growl listaPerfiles nombrePerfil perfilNom btnUsuarios PickAcciones"
                                      oncomplete="altasPerfiles(xhr, status, args);"/>
-                    <p:ajax event="close" 
-                            listener="#{mbUsuarios.elimanarAltasUsuariosClose(event)}"
-                            update="nombrePerfil"
-                            process="@this"/>
                 </p:dialog>
                 <p:dialog  modal="true" 
                            header="Acciones del Modulo"
@@ -163,10 +153,6 @@
                                        actionListener="#{mbUsuarios.guardarAcciones()}"
                                        update="PickAcciones accion idBoton  growl"
                                        oncomplete="altasAcciones(xhr, status, args);"/>
-                    <p:ajax event="close" 
-                            listener="#{mbUsuarios.elimianarAccionesModulos(event)}"
-                            update="accion idBoton"
-                            process="@this"/>
 
                 </p:dialog>
                 <p:dialog  modal="true" header="Base de Datos Del Servidor"
@@ -181,6 +167,8 @@
                         var="pickBd"
                         itemLabel="#{pickBd}"
                         itemValue="#{pickBd}">
+                        <f:facet name="sourceCaption">Disponibles</f:facet>
+                        <f:facet name="targetCaption">Seleccionados</f:facet>
                         <f:converter converterId="traerBdsPickList"/>
                     </p:pickList>
                     <p:commandButton value="Guardar"

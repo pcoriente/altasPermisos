@@ -11,6 +11,20 @@
         <converter-id>traerModulos</converter-id>
         <converter-class>converterPermisos.ConverterModulos</converter-class>
     </converter>
+    
+    
+    <converter>
+        <converter-id>traerModulosMenus</converter-id>
+        <converter-class>converterPermisos.ConverterModulosMenu</converter-class>
+    </converter>
+    
+    
+    <converter>
+        <converter-id>traerModulosSubMenus</converter-id>
+        <converter-class>converterPermisos.ConverterSubModulosMenu</converter-class>
+    </converter>
+    
+    
     <converter>
         <converter-id>traerAcciones</converter-id>
         <converter-class>converterPermisos.ConverterAcciones</converter-class>

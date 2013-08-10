@@ -9,6 +9,8 @@ import dominios.BaseDatos;
 import dominios.DominioUsuarios;
 import dominios.Login;
 import dominios.Modulo;
+import dominios.ModulosMenus;
+import dominios.ModulosSubMenus;
 import dominios.Perfiles;
 import dominios.TablaAcciones;
 import dominios.UsuarioPerfil;
@@ -21,6 +23,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.faces.model.SelectItem;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -578,5 +581,94 @@ public class DaoPer {
             validado = true;
         }
         return validado;
+    }
+
+    public String damePassword() throws SQLException {
+        String sql = "SELECT * FROM accesoAdministrativo";
+        String pass = null;
+        Connection cn = ds.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            pass = rs.getString("password");
+        }
+        cn.close();
+        return pass;
+    }
+
+    public ArrayList<ModulosMenus> dameMOdulosMenu() throws SQLException {
+        String sql = "SELECT * FROM modulosMenus";
+        ArrayList<ModulosMenus> modulosMenus = new ArrayList<>();
+        Connection cn = ds.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            ModulosMenus dModulosMenus = new ModulosMenus();
+            dModulosMenus.setIdMenu(rs.getInt("idMenu"));
+            dModulosMenus.setMenu(rs.getString("menu"));
+            modulosMenus.add(dModulosMenus);
+        }
+        return modulosMenus;
+    }
+
+    public ModulosMenus dameModulosMenu(int id) throws SQLException {
+        String sql = "SELECT * FROM modulosMenus where idMenu=" + id;
+        ModulosMenus m = new ModulosMenus();
+        Connection cn = ds.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                m.setIdMenu(rs.getInt("idMenu"));
+                m.setMenu(rs.getString("menu"));
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+        return m;
+    }
+
+    public ArrayList<ModulosSubMenus> dameSubMenus(int id) throws SQLException {
+        ArrayList<ModulosSubMenus> modulosMenus = new ArrayList<ModulosSubMenus>();
+        String sql = "SELECT * FROM modulosSubMenus WHERE idMenu =" + id;
+        Connection cn = ds.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                ModulosSubMenus m = new ModulosSubMenus();
+                m.setIdSubMenu(rs.getInt("idSubMenu"));
+                m.setSubMenu(rs.getString("subMenu"));
+                modulosMenus.add(m);
+            }
+
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+        return modulosMenus;
+    }
+
+    public ModulosSubMenus dameSubModulosMenu(int id) throws SQLException {
+        ModulosSubMenus moduloSubMenus = new ModulosSubMenus();
+        String sql = "SELECT * FROM modulosSubMenus WHERE idSubMenu =" + id;
+        Connection cn = ds.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sql);
+        try {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                moduloSubMenus.setIdSubMenu(rs.getInt("idSubMenu"));
+                moduloSubMenus.setSubMenu(rs.getString("subMenu"));
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            cn.close();
+        }
+        return moduloSubMenus;
     }
 }

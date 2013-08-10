@@ -9,6 +9,8 @@ import dominios.Acciones;
 import dominios.BaseDatos;
 import dominios.DominioUsuarios;
 import dominios.Modulo;
+import dominios.ModulosMenus;
+import dominios.ModulosSubMenus;
 import dominios.Perfiles;
 import dominios.TablaAcciones;
 import dominios.UsuarioPerfil;
@@ -45,6 +47,8 @@ public class MbUsuarios {
     private List<SelectItem> listaModulos;
     private List<SelectItem> listaBaseDatos;
     private List<SelectItem> listaAcciones;
+    private ArrayList<SelectItem> listaModulosMenu;
+    private ArrayList<SelectItem> listaModulosSubMenu = new ArrayList<>();
     DominioUsuarios u = new DominioUsuarios();
     DominioUsuarios u2 = new DominioUsuarios();
     Modulo m = new Modulo();
@@ -69,6 +73,41 @@ public class MbUsuarios {
     DualListModel<BaseDatos> pickBd = new DualListModel<BaseDatos>();
     ArrayList<BaseDatos> DestinoBd = new ArrayList<BaseDatos>();
     ArrayList<BaseDatos> OrigenBd = new ArrayList<BaseDatos>();
+    ModulosMenus moduloMenuObj = new ModulosMenus();
+    ModulosSubMenus modulosSubMenuObj = new ModulosSubMenus();
+
+    public ModulosSubMenus getModulosSubMenuObj() {
+        return modulosSubMenuObj;
+    }
+
+    public void setModulosSubMenuObj(ModulosSubMenus modulosSubMenuObj) {
+        this.modulosSubMenuObj = modulosSubMenuObj;
+    }
+
+    public ArrayList<SelectItem> getListaModulosSubMenu() throws SQLException {
+        return listaModulosSubMenu;
+    }
+
+    public void setListaModulosSubMenu(ArrayList<SelectItem> listaModulosSubMenu) {
+        this.listaModulosSubMenu = listaModulosSubMenu;
+    }
+
+    public ModulosMenus getModuloMenuObj() {
+        return moduloMenuObj;
+    }
+
+    public void setModuloMenuObj(ModulosMenus moduloMenuObj) {
+        this.moduloMenuObj = moduloMenuObj;
+    }
+
+    public ArrayList<SelectItem> getListaModulosMenu() throws SQLException {
+        listaModulosMenu = dameModulosMenu();
+        return listaModulosMenu;
+    }
+
+    public void setListaModulosMenu(ArrayList<SelectItem> listaModulosMenu) {
+        this.listaModulosMenu = listaModulosMenu;
+    }
 
     public DualListModel<BaseDatos> getPickBd() throws SQLException {
         ArrayList<BaseDatos> a1 = new ArrayList<BaseDatos>();
@@ -376,6 +415,19 @@ public class MbUsuarios {
         if (u.getUsuario().equals("") && u.getLogin().equals("") && u.getPassword().equals("") && u.getEmail().equals("")) {
             loggedIn = false;
             msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Llene todos los Campos");
+        }
+        if (u.getUsuario().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Escriba un Usuario");
+        } else if (u.getLogin().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Escriba un Login");
+        } else if (u.getPassword().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Escriba un Password");
+        } else if (u.getEmail().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Escriba un Email");
         } else {
             validarEmail = utilerias.validarEmail(u.getEmail());
             if (validarEmail == true) {
@@ -439,11 +491,15 @@ public class MbUsuarios {
     }
 
     public void guardarValores() throws SQLException {
-
         if (bd.getIdBaseDatos() == 0 && perfil2.getIdUsuario() == 0 && modulo.getIdModulo() == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:", "Seleccione todas las Opciones"));
+        } else if (bd.getIdBaseDatos() == 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:", "Seleccione una Base de Datos"));
+        } else if (perfil2.getIdPerfiles() == 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:", "Seleccione un perfil"));
+        } else if (modulo.getIdModulo() == 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:", "Seleccione un Modulo"));
         } else {
-
             perfil2.getIdUsuario();
             ArrayList<Acciones> acciones = new ArrayList<Acciones>();
             acciones = (ArrayList<Acciones>) pickAcciones.getTarget();
@@ -460,8 +516,6 @@ public class MbUsuarios {
                 bd.setIdBaseDatos(0);
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Se insertaron los datos Correctamente"));
             }
-
-
         }
     }
 
@@ -593,6 +647,15 @@ public class MbUsuarios {
         if (modulo.getIdModulo() != 0) {
             m.setModulo(modulo.getModulo());
         }
+        if (bd.getIdBaseDatos() == 0) {
+            bd = new BaseDatos();
+        }
+        if (perfil2.getIdPerfiles() == 0) {
+            perfil2 = new Perfiles();
+        }
+        if (modulo.getIdModulo() == 0) {
+            modulo = new Modulo();
+        }
         String nomBd = bd.getBaseDatos();
         int idPerfil = 0;
         if (id > 0) {
@@ -683,5 +746,41 @@ public class MbUsuarios {
 
     public void elimianarAccionesModulos(CloseEvent event) {
         acciones = new Acciones();
+    }
+
+    private ArrayList<SelectItem> dameModulosMenu() throws SQLException {
+        ArrayList<SelectItem> modulosMenu = new ArrayList<>();
+        ArrayList<ModulosMenus> m = new ArrayList<>();
+        ModulosMenus dModulosMenu = new ModulosMenus();
+        dModulosMenu.setIdMenu(0);
+        dModulosMenu.setMenu("SELECCIONE UN MODULO");
+        SelectItem se = new SelectItem(dModulosMenu, dModulosMenu.getMenu());
+        modulosMenu.add(se);
+        DaoPer daoPermisos = new DaoPer();
+        m = daoPermisos.dameMOdulosMenu();
+        for (ModulosMenus modulo : m) {
+            modulosMenu.add(new SelectItem(modulo, modulo.getMenu()));
+        }
+        return modulosMenu;
+    }
+
+    public void dameValorCmb() {
+        System.err.println("hola mundo");
+    }
+
+    public void dameValorId() throws SQLException {
+        int id = moduloMenuObj.getIdMenu();
+        DaoPer daopermisos = new DaoPer();
+        ArrayList<ModulosSubMenus> m5 = new ArrayList<ModulosSubMenus>();
+        m5 = daopermisos.dameSubMenus(id);
+        ModulosSubMenus modulosSub = new ModulosSubMenus();
+        modulosSub.setIdSubMenu(0);
+        modulosSub.setSubMenu("Selecciona un SubModulo");
+        SelectItem selectItem = new SelectItem(modulosSub, modulosSub.getSubMenu());
+        listaModulosSubMenu.add(selectItem);
+        for (ModulosSubMenus m4 : m5) {
+            SelectItem s = new SelectItem(m4, m4.getSubMenu());
+            listaModulosSubMenu.add(s);
+        }
     }
 }

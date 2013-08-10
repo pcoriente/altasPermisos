@@ -8,6 +8,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import javax.faces.context.FacesContext;
 import org.primefaces.context.RequestContext;
+import utilerias.Utilerias;
 
 /**
  *
@@ -30,20 +31,19 @@ public class MbLogin {
     public MbLogin() {
     }
 
-    public String validarLogin() throws SQLException {
+    public String validarLogin() throws SQLException, Exception {
         String pagina = "";
-        boolean valido;
-        DaoPer daop = new DaoPer();
-        RequestContext context = RequestContext.getCurrentInstance();
-        FacesMessage msg = null;
-        boolean loggedIn = false;
-        valido = daop.loguearme(login);
-        if (valido == false) {
-            msg = new FacesMessage(FacesMessage.SEVERITY_FATAL, "Error", "Ingrese los datos correspondientes");
+        Utilerias u = new Utilerias();
+        DaoPer p = new DaoPer();
+        String pass = p.damePassword();
+        String pass2 = u.md5(login.getPassword());
+        boolean paso = pass.equals(pass2);
+        if (paso == true) {
+            pagina = "altasPermisos.xhtml";
         }
-        msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Removido", "Las bases de Datos fueron removidas");
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-        context.addCallbackParam("Bd´s", loggedIn);
+        else{
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL,"Denegado!!", "Ingrese la contraseña correcta"));  
+        }
         return pagina;
     }
 }
