@@ -9,11 +9,11 @@ import dominios.Acciones;
 import dominios.BaseDatos;
 import dominios.DominioUsuarios;
 import dominios.Modulo;
-import dominios.ModulosMenus;
-import dominios.ModulosSubMenus;
+import dominios.ModuloMenu;
+import dominios.ModuloSubMenu;
 import dominios.Perfiles;
-import dominios.TablaAcciones;
 import dominios.UsuarioPerfil;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +22,9 @@ import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
+import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
-import javax.xml.bind.ParseConversionEvent;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.CloseEvent;
 import org.primefaces.model.DualListModel;
@@ -36,8 +35,8 @@ import utilerias.Utilerias;
  * @author Comodoro
  */
 @ManagedBean
-@RequestScoped
-public class MbUsuarios {
+@SessionScoped
+public class MbUsuarios implements Serializable {
 
     /**
      * Creates a new instance of MbUsuarios
@@ -48,7 +47,7 @@ public class MbUsuarios {
     private List<SelectItem> listaBaseDatos;
     private List<SelectItem> listaAcciones;
     private ArrayList<SelectItem> listaModulosMenu;
-    private ArrayList<SelectItem> listaModulosSubMenu = new ArrayList<>();
+    private ArrayList<SelectItem> listaModulosSubMenu;
     DominioUsuarios u = new DominioUsuarios();
     DominioUsuarios u2 = new DominioUsuarios();
     Modulo m = new Modulo();
@@ -73,16 +72,8 @@ public class MbUsuarios {
     DualListModel<BaseDatos> pickBd = new DualListModel<BaseDatos>();
     ArrayList<BaseDatos> DestinoBd = new ArrayList<BaseDatos>();
     ArrayList<BaseDatos> OrigenBd = new ArrayList<BaseDatos>();
-    ModulosMenus moduloMenuObj = new ModulosMenus();
-    ModulosSubMenus modulosSubMenuObj = new ModulosSubMenus();
-
-    public ModulosSubMenus getModulosSubMenuObj() {
-        return modulosSubMenuObj;
-    }
-
-    public void setModulosSubMenuObj(ModulosSubMenus modulosSubMenuObj) {
-        this.modulosSubMenuObj = modulosSubMenuObj;
-    }
+    ModuloMenu moduloMenu = new ModuloMenu();
+    ModuloSubMenu moduloSubMenu = new ModuloSubMenu();
 
     public ArrayList<SelectItem> getListaModulosSubMenu() throws SQLException {
         return listaModulosSubMenu;
@@ -92,16 +83,10 @@ public class MbUsuarios {
         this.listaModulosSubMenu = listaModulosSubMenu;
     }
 
-    public ModulosMenus getModuloMenuObj() {
-        return moduloMenuObj;
-    }
-
-    public void setModuloMenuObj(ModulosMenus moduloMenuObj) {
-        this.moduloMenuObj = moduloMenuObj;
-    }
-
     public ArrayList<SelectItem> getListaModulosMenu() throws SQLException {
-        listaModulosMenu = dameModulosMenu();
+        if(this.listaModulosMenu==null) {
+            listaModulosMenu = this.dameModulosMenu();
+        }
         return listaModulosMenu;
     }
 
@@ -448,6 +433,7 @@ public class MbUsuarios {
     }
 
     public void guardarModulo() throws SQLException {
+        String strSubMenu = this.moduloSubMenu.getSubMenu();
         DaoPer daoPer = new DaoPer();
         RequestContext context = RequestContext.getCurrentInstance();
         FacesMessage msg = null;
@@ -748,18 +734,22 @@ public class MbUsuarios {
         acciones = new Acciones();
     }
 
-    private ArrayList<SelectItem> dameModulosMenu() throws SQLException {
+    private ArrayList<SelectItem> dameModulosMenu() {
         ArrayList<SelectItem> modulosMenu = new ArrayList<>();
-        ArrayList<ModulosMenus> m = new ArrayList<>();
-        ModulosMenus dModulosMenu = new ModulosMenus();
-        dModulosMenu.setIdMenu(0);
-        dModulosMenu.setMenu("SELECCIONE UN MODULO");
-        SelectItem se = new SelectItem(dModulosMenu, dModulosMenu.getMenu());
-        modulosMenu.add(se);
-        DaoPer daoPermisos = new DaoPer();
-        m = daoPermisos.dameMOdulosMenu();
-        for (ModulosMenus modulo : m) {
-            modulosMenu.add(new SelectItem(modulo, modulo.getMenu()));
+        try {
+            ModuloMenu dModulosMenu = new ModuloMenu();
+            dModulosMenu.setIdMenu(0);
+            dModulosMenu.setMenu("SELECCIONE UN MODULO");
+            SelectItem se = new SelectItem(dModulosMenu, dModulosMenu.getMenu());
+            modulosMenu.add(se);
+            
+            DaoPer daoPermisos = new DaoPer();
+            ArrayList<ModuloMenu> m = daoPermisos.dameMOdulosMenu();
+            for (ModuloMenu moduloMenu : m) {
+                modulosMenu.add(new SelectItem(moduloMenu, moduloMenu.getMenu()));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(MbUsuarios.class.getName()).log(Level.SEVERE, null, ex);
         }
         return modulosMenu;
     }
@@ -768,19 +758,43 @@ public class MbUsuarios {
         System.err.println("hola mundo");
     }
 
-    public void dameValorId() throws SQLException {
-        int id = moduloMenuObj.getIdMenu();
-        DaoPer daopermisos = new DaoPer();
-        ArrayList<ModulosSubMenus> m5 = new ArrayList<ModulosSubMenus>();
-        m5 = daopermisos.dameSubMenus(id);
-        ModulosSubMenus modulosSub = new ModulosSubMenus();
-        modulosSub.setIdSubMenu(0);
-        modulosSub.setSubMenu("Selecciona un SubModulo");
-        SelectItem selectItem = new SelectItem(modulosSub, modulosSub.getSubMenu());
-        listaModulosSubMenu.add(selectItem);
-        for (ModulosSubMenus m4 : m5) {
-            SelectItem s = new SelectItem(m4, m4.getSubMenu());
-            listaModulosSubMenu.add(s);
+    public void dameValorId() {
+        try {
+            int id = moduloMenu.getIdMenu();
+            DaoPer daopermisos = new DaoPer();
+            ArrayList<ModuloSubMenu> subMenus = new ArrayList<ModuloSubMenu>();
+            subMenus = daopermisos.dameSubMenus(id);
+            
+            
+            ModuloSubMenu modulosSub = new ModuloSubMenu();
+            modulosSub.setIdSubMenu(0);
+            modulosSub.setSubMenu("Selecciona un SubModulo");
+            SelectItem selectItem = new SelectItem(modulosSub, modulosSub.getSubMenu());
+            
+            this.listaModulosSubMenu=new ArrayList<SelectItem>();
+            listaModulosSubMenu.add(selectItem);
+            for (ModuloSubMenu m4 : subMenus) {
+                SelectItem s = new SelectItem(m4, m4.getSubMenu());
+                listaModulosSubMenu.add(s);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(MbUsuarios.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public ModuloMenu getModuloMenu() {
+        return moduloMenu;
+    }
+
+    public void setModuloMenu(ModuloMenu moduloMenu) {
+        this.moduloMenu = moduloMenu;
+    }
+
+    public ModuloSubMenu getModuloSubMenu() {
+        return moduloSubMenu;
+    }
+
+    public void setModuloSubMenu(ModuloSubMenu moduloSubMenu) {
+        this.moduloSubMenu = moduloSubMenu;
     }
 }

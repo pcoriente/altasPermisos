@@ -9,8 +9,8 @@ import dominios.BaseDatos;
 import dominios.DominioUsuarios;
 import dominios.Login;
 import dominios.Modulo;
-import dominios.ModulosMenus;
-import dominios.ModulosSubMenus;
+import dominios.ModuloMenu;
+import dominios.ModuloSubMenu;
 import dominios.Perfiles;
 import dominios.TablaAcciones;
 import dominios.UsuarioPerfil;
@@ -111,8 +111,6 @@ public class DaoPer {
 
 
 
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -132,8 +130,6 @@ public class DaoPer {
             while (rs.next()) {
                 identity = rs.getInt("indentidad");
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -153,8 +149,6 @@ public class DaoPer {
                 modulo.setModulo(rs.getString("modulo"));
                 modulos.add(modulo);
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -173,8 +167,6 @@ public class DaoPer {
                 m.setIdModulo(rs.getInt("idModulo"));
                 m.setModulo(rs.getString("modulo"));
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -187,8 +179,6 @@ public class DaoPer {
         Connection cn = ds.getConnection();
         PreparedStatement ps = cn.prepareStatement(sql);
         try {
-
-
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 BaseDatos bd = new BaseDatos();
@@ -197,8 +187,6 @@ public class DaoPer {
                 bd.setJndi(rs.getString("jndi"));
                 listBd.add(bd);
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -215,8 +203,6 @@ public class DaoPer {
         ps.setInt(3, acciones.getIdMOdulo());
         try {
             ps.executeUpdate();
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -236,8 +222,6 @@ public class DaoPer {
             while (rs.next()) {
                 identity = rs.getInt("indentidad");
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -256,8 +240,6 @@ public class DaoPer {
                 b.setBaseDatos(rs.getString("baseDeDatos"));
                 b.setJndi(rs.getString("jndi"));
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -277,8 +259,6 @@ public class DaoPer {
                 p.setPerfil(rs.getString("perfil"));
                 perfil.add(p);
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -297,8 +277,6 @@ public class DaoPer {
                 p.setIdPerfiles(rs.getInt("idPerfil"));
                 p.setPerfil(rs.getString("perfil"));
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -320,30 +298,10 @@ public class DaoPer {
                 ps.setInt(3, idAccion);
                 ps.executeUpdate();
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
     }
-//    public ArrayList<UsuarioPerfil> dameValoresUsuarioPerfil() throws SQLException {
-//        ArrayList<UsuarioPerfil> uP = new ArrayList<>();
-//        String sql = "SELECT * \n"
-//                + "FROM usuarioPerfil up\n"
-//                + "INNER JOIN basesDeDatos bd \n"
-//                + "on  bd.idBaseDeDatos = up.idBaseDeDatos\n"
-//                + "INNER JOIN modulos md \n"
-//                + "on md.idModulo = up.idModulo\n"
-//                + "INNER JOIN perfiles p \n"
-//                + "on p.idPerfil = up.idPerfil";
-//        ArrayList<UsuarioPerfil> usuarioPerfil = new ArrayList<>();
-//        Connection cn = ds.getConnection();
-//        PreparedStatement ps = cn.prepareStatement(sql);
-//        ResultSet rs = ps.executeQuery();
-//        while (rs.next()) {
-//        }
-//        return uP;
-//    }
 
     public ArrayList<Acciones> dameAcciones() throws SQLException {
         Connection cn = ds.getConnection();
@@ -360,8 +318,6 @@ public class DaoPer {
                 acciones.setIdMOdulo(rs.getInt("idModulo"));
                 listAcciones.add(acciones);
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -382,8 +338,6 @@ public class DaoPer {
                 acciones.setIdBoton(rs.getString("idBoton"));
                 acciones.setIdMOdulo(rs.getInt("idModulo"));
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -404,8 +358,6 @@ public class DaoPer {
                 accion.setIdAccion(rs.getInt("idAccion"));
                 acciones.add(accion);
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -434,8 +386,6 @@ public class DaoPer {
                 tA.setIdPerfil(rs.getInt("idPerfil"));
                 tabla.add(tA);
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -458,8 +408,6 @@ public class DaoPer {
             while (rs.next()) {
                 identity = rs.getInt("indentidad");
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
@@ -475,8 +423,8 @@ public class DaoPer {
         ps.setInt(3, idPerfil);
         try {
             ps.executeUpdate();
-        } catch (Exception e) {
-            System.err.println(e);
+        } finally {
+            cn.close();
         }
     }
 
@@ -488,11 +436,8 @@ public class DaoPer {
         PreparedStatement ps = cn.prepareStatement(sql);
         try {
             ps.executeUpdate();
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
-            ps.close();
         }
     }
 
@@ -502,11 +447,8 @@ public class DaoPer {
         PreparedStatement ps = cn.prepareStatement(sql);
         try {
             ps.executeUpdate();
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
-            ps.close();
         }
 
     }
@@ -517,11 +459,8 @@ public class DaoPer {
         PreparedStatement ps = cn.prepareStatement(sql);
         try {
             ps.executeUpdate();
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
-            ps.close();
         }
     }
 
@@ -540,8 +479,6 @@ public class DaoPer {
                 lista.add(bds);
                 id++;
             }
-        } catch (SQLException e) {
-            cn.rollback();
         } finally {
             cn.close();
         }
@@ -563,14 +500,11 @@ public class DaoPer {
                 ps.setString(2, jndi);
                 ps.executeUpdate();
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
-            ps.close();
         }
     }
-
+    /*
     public boolean loguearme(Login log) throws SQLException {
         boolean validado = false;
         String sql = "SELECT * FROM tabla";
@@ -582,38 +516,48 @@ public class DaoPer {
         }
         return validado;
     }
-
+    * */
     public String damePassword() throws SQLException {
-        String sql = "SELECT * FROM accesoAdministrativo";
         String pass = null;
+        String sql = "SELECT * FROM accesoAdministrativo";
+        
         Connection cn = ds.getConnection();
         PreparedStatement ps = cn.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            pass = rs.getString("password");
+        try {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                pass = rs.getString("password");
+            }
+        } finally {
+            cn.close();
         }
-        cn.close();
         return pass;
     }
 
-    public ArrayList<ModulosMenus> dameMOdulosMenu() throws SQLException {
+    public ArrayList<ModuloMenu> dameMOdulosMenu() throws SQLException {
         String sql = "SELECT * FROM modulosMenus";
-        ArrayList<ModulosMenus> modulosMenus = new ArrayList<>();
+        ArrayList<ModuloMenu> modulosMenus = new ArrayList<>();
+        
         Connection cn = ds.getConnection();
         PreparedStatement ps = cn.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            ModulosMenus dModulosMenus = new ModulosMenus();
-            dModulosMenus.setIdMenu(rs.getInt("idMenu"));
-            dModulosMenus.setMenu(rs.getString("menu"));
-            modulosMenus.add(dModulosMenus);
+        ResultSet rs;
+        try {
+            rs = ps.executeQuery();
+             while (rs.next()) {
+                ModuloMenu dModulosMenus = new ModuloMenu();
+                dModulosMenus.setIdMenu(rs.getInt("idMenu"));
+                dModulosMenus.setMenu(rs.getString("menu"));
+                modulosMenus.add(dModulosMenus);
+            }
+        } finally {
+            cn.close();
         }
         return modulosMenus;
     }
 
-    public ModulosMenus dameModulosMenu(int id) throws SQLException {
+    public ModuloMenu dameModulosMenu(int id) throws SQLException {
         String sql = "SELECT * FROM modulosMenus where idMenu=" + id;
-        ModulosMenus m = new ModulosMenus();
+        ModuloMenu m = new ModuloMenu();
         Connection cn = ds.getConnection();
         PreparedStatement ps = cn.prepareStatement(sql);
         try {
@@ -622,16 +566,14 @@ public class DaoPer {
                 m.setIdMenu(rs.getInt("idMenu"));
                 m.setMenu(rs.getString("menu"));
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
         return m;
     }
 
-    public ArrayList<ModulosSubMenus> dameSubMenus(int id) throws SQLException {
-        ArrayList<ModulosSubMenus> modulosMenus = new ArrayList<ModulosSubMenus>();
+    public ArrayList<ModuloSubMenu> dameSubMenus(int id) throws SQLException {
+        ArrayList<ModuloSubMenu> modulosMenus = new ArrayList<ModuloSubMenu>();
         String sql = "SELECT * FROM modulosSubMenus WHERE idMenu =" + id;
         Connection cn = ds.getConnection();
         PreparedStatement ps = cn.prepareStatement(sql);
@@ -639,22 +581,19 @@ public class DaoPer {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                ModulosSubMenus m = new ModulosSubMenus();
+                ModuloSubMenu m = new ModuloSubMenu();
                 m.setIdSubMenu(rs.getInt("idSubMenu"));
                 m.setSubMenu(rs.getString("subMenu"));
                 modulosMenus.add(m);
             }
-
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
         return modulosMenus;
     }
 
-    public ModulosSubMenus dameSubModulosMenu(int id) throws SQLException {
-        ModulosSubMenus moduloSubMenus = new ModulosSubMenus();
+    public ModuloSubMenu dameSubModulosMenu(int id) throws SQLException {
+        ModuloSubMenu moduloSubMenus = new ModuloSubMenu();
         String sql = "SELECT * FROM modulosSubMenus WHERE idSubMenu =" + id;
         Connection cn = ds.getConnection();
         PreparedStatement ps = cn.prepareStatement(sql);
@@ -664,8 +603,6 @@ public class DaoPer {
                 moduloSubMenus.setIdSubMenu(rs.getInt("idSubMenu"));
                 moduloSubMenus.setSubMenu(rs.getString("subMenu"));
             }
-        } catch (Exception e) {
-            System.err.println(e);
         } finally {
             cn.close();
         }
