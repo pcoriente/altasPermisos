@@ -9,8 +9,22 @@
     
     <converter>
         <converter-id>traerModulos</converter-id>
-        <converter-class>converterPermisos.ConverterModulos</converter-class>
+        <converter-class>converterPermisos.ConverterModulo</converter-class>
     </converter>
+    
+    
+    <converter>
+        <converter-id>traerModulosMenus</converter-id>
+        <converter-class>converterPermisos.ConverterModuloMenu</converter-class>
+    </converter>
+    
+    
+    <converter>
+        <converter-id>traerModulosSubMenus</converter-id>
+        <converter-class>converterPermisos.ConverterModuloSubMenu</converter-class>
+    </converter>
+    
+    
     <converter>
         <converter-id>traerAcciones</converter-id>
         <converter-class>converterPermisos.ConverterAcciones</converter-class>

@@ -2,16 +2,18 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mdPermisos;
+package mbPermisos;
 
 import daoPermisos.DaoPer;
 import dominios.Acciones;
 import dominios.BaseDatos;
 import dominios.DominioUsuarios;
 import dominios.Modulo;
+import dominios.ModuloMenu;
+import dominios.ModuloSubMenu;
 import dominios.Perfiles;
-import dominios.TablaAcciones;
 import dominios.UsuarioPerfil;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +22,10 @@ import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
+import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
-import javax.xml.bind.ParseConversionEvent;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.CloseEvent;
 import org.primefaces.model.DualListModel;
 import utilerias.Utilerias;
@@ -33,8 +35,8 @@ import utilerias.Utilerias;
  * @author Comodoro
  */
 @ManagedBean
-@RequestScoped
-public class MbUsuarios {
+@SessionScoped
+public class MbUsuarios implements Serializable {
 
     /**
      * Creates a new instance of MbUsuarios
@@ -44,6 +46,8 @@ public class MbUsuarios {
     private List<SelectItem> listaModulos;
     private List<SelectItem> listaBaseDatos;
     private List<SelectItem> listaAcciones;
+    private ArrayList<SelectItem> listaModulosMenu;
+    private ArrayList<SelectItem> listaModulosSubMenu;
     DominioUsuarios u = new DominioUsuarios();
     DominioUsuarios u2 = new DominioUsuarios();
     Modulo m = new Modulo();
@@ -68,6 +72,27 @@ public class MbUsuarios {
     DualListModel<BaseDatos> pickBd = new DualListModel<BaseDatos>();
     ArrayList<BaseDatos> DestinoBd = new ArrayList<BaseDatos>();
     ArrayList<BaseDatos> OrigenBd = new ArrayList<BaseDatos>();
+    ModuloMenu moduloMenu = new ModuloMenu();
+    ModuloSubMenu moduloSubMenu = new ModuloSubMenu();
+
+    public ArrayList<SelectItem> getListaModulosSubMenu() throws SQLException {
+        return listaModulosSubMenu;
+    }
+
+    public void setListaModulosSubMenu(ArrayList<SelectItem> listaModulosSubMenu) {
+        this.listaModulosSubMenu = listaModulosSubMenu;
+    }
+
+    public ArrayList<SelectItem> getListaModulosMenu() throws SQLException {
+        if(this.listaModulosMenu==null) {
+            listaModulosMenu = this.dameModulosMenu();
+        }
+        return listaModulosMenu;
+    }
+
+    public void setListaModulosMenu(ArrayList<SelectItem> listaModulosMenu) {
+        this.listaModulosMenu = listaModulosMenu;
+    }
 
     public DualListModel<BaseDatos> getPickBd() throws SQLException {
         ArrayList<BaseDatos> a1 = new ArrayList<BaseDatos>();
@@ -141,7 +166,7 @@ public class MbUsuarios {
     public DualListModel<Acciones> getPickAcciones() throws SQLException {
         pickAcciones = new DualListModel<Acciones>(accionesOrigen, accionesDestino);
         return pickAcciones;
-        
+
     }
 
     public void setPickAcciones(DualListModel<Acciones> pickAcciones) {
@@ -367,25 +392,72 @@ public class MbUsuarios {
 
     public void insertarDatos() throws SQLException, Exception {
         DaoPer daoUsuario = new DaoPer();
+        RequestContext context = RequestContext.getCurrentInstance();
+        FacesMessage msg = null;
+        boolean loggedIn = false;
+        boolean validarEmail = false;
         Utilerias utilerias = new Utilerias();
-        String fecha = utilerias.dameFecha();
-        daoUsuario.insertarUsuario(u, bd.getIdBaseDatos(), perfil2.getIdPerfiles());
-        bd.getIdBaseDatos();
-        perfil2.getIdPerfiles();
-        u = new DominioUsuarios();
+        if (u.getUsuario().equals("") && u.getLogin().equals("") && u.getPassword().equals("") && u.getEmail().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Llene todos los Campos");
+        }
+        if (u.getUsuario().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Escriba un Usuario");
+        } else if (u.getLogin().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Escriba un Login");
+        } else if (u.getPassword().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Escriba un Password");
+        } else if (u.getEmail().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Escriba un Email");
+        } else {
+            validarEmail = utilerias.validarEmail(u.getEmail());
+            if (validarEmail == true) {
+                String fecha = utilerias.dameFecha();
+                daoUsuario.insertarUsuario(u, bd.getIdBaseDatos(), perfil2.getIdPerfiles());
+                bd.getIdBaseDatos();
+                perfil2.getIdPerfiles();
+                u = new DominioUsuarios();
+                loggedIn = true;
+                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Nuevo Usuario Disponible");
+            } else {
+                loggedIn = false;
+                msg = new FacesMessage(FacesMessage.SEVERITY_FATAL, "Error", "Ingrese un Email Valido");
+            }
+        }
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        context.addCallbackParam("loggedIn", loggedIn);
     }
 
     public void guardarModulo() throws SQLException {
+        String strSubMenu = this.moduloSubMenu.getSubMenu();
         DaoPer daoPer = new DaoPer();
+        RequestContext context = RequestContext.getCurrentInstance();
+        FacesMessage msg = null;
+        boolean loggedIn = false;
         if (modulo.getIdModulo() != 0) {
             m.getModulo();
             m.setIdModulo(modulo.getIdModulo());
             daoPer.ActualizarModulos(m);
+            loggedIn = true;
+            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "El Modulo fue Actualizado Correctamente");
         } else {
-            int identity = daoPer.guardarModulo(m);
-            modulo.setIdModulo(identity);
-            modulo.setModulo(m.getModulo());
+            if (m.getModulo().equals("")) {
+                loggedIn = false;
+                msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Ingrese un Nombre de Modulo");
+            } else {
+                int identity = daoPer.guardarModulo(m);
+                loggedIn = true;
+                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Nuevo Modulo Disponible");
+                modulo.setIdModulo(identity);
+                modulo.setModulo(m.getModulo());
+            }
         }
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        context.addCallbackParam("loggedIn", loggedIn);
     }
 
     private List<SelectItem> dameModulos() throws SQLException {
@@ -405,11 +477,15 @@ public class MbUsuarios {
     }
 
     public void guardarValores() throws SQLException {
-
         if (bd.getIdBaseDatos() == 0 && perfil2.getIdUsuario() == 0 && modulo.getIdModulo() == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:", "Seleccione todas las Opciones"));
+        } else if (bd.getIdBaseDatos() == 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:", "Seleccione una Base de Datos"));
+        } else if (perfil2.getIdPerfiles() == 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:", "Seleccione un perfil"));
+        } else if (modulo.getIdModulo() == 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:", "Seleccione un Modulo"));
         } else {
-
             perfil2.getIdUsuario();
             ArrayList<Acciones> acciones = new ArrayList<Acciones>();
             acciones = (ArrayList<Acciones>) pickAcciones.getTarget();
@@ -426,28 +502,37 @@ public class MbUsuarios {
                 bd.setIdBaseDatos(0);
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Se insertaron los datos Correctamente"));
             }
-
-
         }
     }
 
     public void guardarAcciones() throws SQLException {
-        DaoPer daoPermisos = new DaoPer();
-        acciones.setIdMOdulo(modulo.getIdModulo());
-        daoPermisos.insertarAcciones(acciones);
-        dameModulosAcciones(0);
-        eliminarAcciones();
-    }
-
-    public void eliminarAcciones() {
-        acciones.setAccion(null);
-        acciones.setIdAccion(0);
-        acciones.setIdMOdulo(0);
-        acciones.setIdBoton(null);
-        acciones.setSta(false);
-        acciones.setStatus(0);
-        acciones.setStatus(0);
-        m3.setIdModulo(0);
+        RequestContext context = RequestContext.getCurrentInstance();
+        FacesMessage msg = null;
+        boolean loggedIn = false;
+        if (acciones.getAccion().equals("") && acciones.getIdBoton().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Ingrese una Accion y un IdButom");
+            dameModulosAcciones(0);
+        } else if (acciones.getIdBoton().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Ingrese el idBotom");
+            dameModulosAcciones(0);
+        } else if (acciones.getAccion().equals("")) {
+            loggedIn = false;
+            msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Ingrese una Acción");
+            dameModulosAcciones(0);
+        } else {
+            loggedIn = true;
+            DaoPer daoPermisos = new DaoPer();
+            acciones.setIdMOdulo(modulo.getIdModulo());
+            daoPermisos.insertarAcciones(acciones);
+            dameModulosAcciones(0);
+            acciones = new Acciones();
+            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Nuevas Acciones Disponibles");
+//            RequestContext.getCurrentInstance().execute("dlg.hide();");
+        }
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        context.addCallbackParam("loggedIn", loggedIn);
     }
 
     private List<SelectItem> dameBd() throws SQLException {
@@ -468,19 +553,32 @@ public class MbUsuarios {
 
     public void guardarPerfil() throws SQLException {
         DaoPer daoPer = new DaoPer();
+        RequestContext context = RequestContext.getCurrentInstance();
+        FacesMessage msg = null;
+        boolean loggedIn = false;
         if (perfil2.getIdPerfiles() != 0) {
             perfil.getPerfil();
             perfil.setIdPerfiles(perfil2.getIdPerfiles());
             daoPer.ActualizarPerfiles(perfil);
+            loggedIn = true;
+            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Perfil Actualizado");
         } else {
-            u2.getIdUsuario();
-            perfil.setIdUsuario(u2.getIdUsuario());
-            int identity = daoPer.insertarPerfil(perfil);
-            dameModulosAcciones(identity);
-            perfil2.setIdPerfiles(identity);
-            perfil2.setPerfil(perfil.getPerfil());
-//          perfil = new Perfiles();
+            if (perfil.getPerfil().equals("")) {
+                loggedIn = false;
+                msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Error", "Ingrese un Nombre de Perfil");
+            } else {
+                u2.getIdUsuario();
+                perfil.setIdUsuario(u2.getIdUsuario());
+                int identity = daoPer.insertarPerfil(perfil);
+                dameModulosAcciones(identity);
+                perfil2.setIdPerfiles(identity);
+                perfil2.setPerfil(perfil.getPerfil());
+                loggedIn = true;
+                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito", "Nuevo Perfil Disponible");
+            }
         }
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        context.addCallbackParam("loggedIn", loggedIn);
     }
 
     private List<SelectItem> damePerfiles() throws SQLException {
@@ -535,13 +633,21 @@ public class MbUsuarios {
         if (modulo.getIdModulo() != 0) {
             m.setModulo(modulo.getModulo());
         }
-        String nomBd = bd.getBaseDatos();
-         int idPerfil =0;
-        if(id>0){
-            idPerfil=id;
+        if (bd.getIdBaseDatos() == 0) {
+            bd = new BaseDatos();
         }
-        else{
-            idPerfil= perfil2.getIdPerfiles();
+        if (perfil2.getIdPerfiles() == 0) {
+            perfil2 = new Perfiles();
+        }
+        if (modulo.getIdModulo() == 0) {
+            modulo = new Modulo();
+        }
+        String nomBd = bd.getBaseDatos();
+        int idPerfil = 0;
+        if (id > 0) {
+            idPerfil = id;
+        } else {
+            idPerfil = perfil2.getIdPerfiles();
         }
         int idModulo = modulo.getIdModulo();
         if (idPerfil != 0 && idModulo != 0 && nomBd != null) {
@@ -591,17 +697,104 @@ public class MbUsuarios {
     }
 
     public void dameBdsPickList() throws SQLException {
-//        FacesMessage fMsg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Aviso:", "");
-//        fMsg.setDetail("Se requiere un grupo !!");
-//        FacesContext.getCurrentInstance().addMessage(null, fMsg);
+        RequestContext context = RequestContext.getCurrentInstance();
+        FacesMessage msg = null;
+        boolean loggedIn;
         ArrayList<BaseDatos> bd = new ArrayList<BaseDatos>();
-        if (bd.size() >0) {
-
+        if (bd.size() > 0) {
         } else {
             bd = (ArrayList<BaseDatos>) pickBd.getTarget();
             DaoPer p = new DaoPer();
             p.insertarBd(bd);
+            if (pickBd.getTarget().size() == 0) {
+                loggedIn = true;
+                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Removido", "Las bases de Datos fueron removidas");
+            } else {
+                loggedIn = true;
+                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Agregadas", "Nuevas Bases de Datos disponibles");
+            }
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+            context.addCallbackParam("Bd´s", loggedIn);
         }
+    }
 
+    public void elimanarModulosClose(CloseEvent event) {
+        m = new Modulo();
+    }
+
+    public void elimanarUsuariosClose(CloseEvent event) {
+        u = new DominioUsuarios();
+    }
+
+    public void elimanarAltasUsuariosClose(CloseEvent event) {
+        perfil = new Perfiles();
+    }
+
+    public void elimianarAccionesModulos(CloseEvent event) {
+        acciones = new Acciones();
+    }
+
+    private ArrayList<SelectItem> dameModulosMenu() {
+        ArrayList<SelectItem> modulosMenu = new ArrayList<SelectItem>();
+        try {
+            ModuloMenu dModulosMenu = new ModuloMenu();
+            dModulosMenu.setIdMenu(0);
+            dModulosMenu.setMenu("SELECCIONE UN MODULO");
+            SelectItem se = new SelectItem(dModulosMenu, dModulosMenu.getMenu());
+            modulosMenu.add(se);
+            
+            DaoPer daoPermisos = new DaoPer();
+            ArrayList<ModuloMenu> m = daoPermisos.dameMOdulosMenu();
+            for (ModuloMenu moduloMenu : m) {
+                modulosMenu.add(new SelectItem(moduloMenu, moduloMenu.getMenu()));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(MbUsuarios.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return modulosMenu;
+    }
+
+    public void dameValorCmb() {
+        System.err.println("hola mundo");
+    }
+
+    public void dameValorId() {
+        try {
+            int id = moduloMenu.getIdMenu();
+            DaoPer daopermisos = new DaoPer();
+            ArrayList<ModuloSubMenu> subMenus = new ArrayList<ModuloSubMenu>();
+            subMenus = daopermisos.dameSubMenus(id);
+            
+            
+            ModuloSubMenu modulosSub = new ModuloSubMenu();
+            modulosSub.setIdSubMenu(0);
+            modulosSub.setSubMenu("Selecciona un SubModulo");
+            SelectItem selectItem = new SelectItem(modulosSub, modulosSub.getSubMenu());
+            
+            this.listaModulosSubMenu=new ArrayList<SelectItem>();
+            listaModulosSubMenu.add(selectItem);
+            for (ModuloSubMenu m4 : subMenus) {
+                SelectItem s = new SelectItem(m4, m4.getSubMenu());
+                listaModulosSubMenu.add(s);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(MbUsuarios.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public ModuloMenu getModuloMenu() {
+        return moduloMenu;
+    }
+
+    public void setModuloMenu(ModuloMenu moduloMenu) {
+        this.moduloMenu = moduloMenu;
+    }
+
+    public ModuloSubMenu getModuloSubMenu() {
+        return moduloSubMenu;
+    }
+
+    public void setModuloSubMenu(ModuloSubMenu moduloSubMenu) {
+        this.moduloSubMenu = moduloSubMenu;
     }
 }

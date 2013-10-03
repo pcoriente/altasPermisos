@@ -13,15 +13,15 @@
                 <h:graphicImage  library="images" name="encabezado.jpg" /> 
                 <center>
                     <p:panel header="Panel de Administración" style="width: 700px" >
-                        <p:growl id="growl" showDetail="true" life="3000" />
+                        <p:growl id="growl" showDetail="true" life="3000" />  
                         <h:panelGrid columns="5">
                             <p:commandButton value="Bases de Datos" style="width: 120px; height: 60px" onclick="agregarBds.show();"/>
                             <p:commandButton id="btnPerfil"  value="Perfiles" style="width: 120px; height: 58px" onclick="perfil.show();"/>
                             <p:commandButton id="btnUsuarios" value="Usuarios"  style="width: 120px; height: 58px" disabled="#{mbUsuarios.bd.idBaseDatos==0 || mbUsuarios.perfil2.idPerfiles==0}" onclick="dlg.show();"/>
-                            <p:commandButton id="btnModulos" value="Módulos" style="width: 120px; height: 58px" onclick="modulo.show();" immediate="true"/>
+                            <p:commandButton id="btnModulos" value="Módulos" style="width: 120px; height: 58px" onclick="modulo.show();"/>
                             <p:commandButton id="btnAcciones" value="Acciones" style="width: 120px; height: 58px" disabled="#{mbUsuarios.modulo.idModulo == 0}" onclick="acciones.show();"/>
                         </h:panelGrid>
-                        <!--<p:messages id="messages" showDetail="true" autoUpdate="true" closable="true"/>-->
+                        <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true"/>  
                         <br></br>
                         <h:panelGrid columns="2">
                             <p:outputLabel>Base de Datos:</p:outputLabel>
@@ -113,43 +113,14 @@
                 </p:dialog>
                 <p:dialog  modal="true" header="Altas de Modulos" widgetVar="modulo" hideEffect="explode">
                     <br></br>
-                    <p:panelGrid >
-                        <p:row >
-                            <p:column >
-                                <h:outputLabel for="menu" value="MENU :"  style="font-weight: bold; color: red; width: 105px;" />
-                            </p:column>
-                            <p:column >
-                                <p:selectOneMenu id="menu" value="#{mbUsuarios.moduloMenu}" style="width: 300px" >
-                                    <f:converter converterId="traerModulosMenus" />
-                                    <f:selectItems value="#{mbUsuarios.listaModulosMenu}" />
-                                    <p:ajax event="change" listener="#{mbUsuarios.dameValorId()}" update="subMenu" />
-                                </p:selectOneMenu>
-                            </p:column>
-                        </p:row>
-                        <p:row >
-                            <p:column >
-                                <h:outputLabel for="subMenu" value="SUBMENU :"  style="font-weight: bold; color: red; width: 105px;" />
-                            </p:column>
-                            <p:column >
-                                <p:selectOneMenu id="subMenu" value="#{mbUsuarios.moduloSubMenu}" style="width: 300px;" >
-                                    <f:converter converterId="traerModulosSubMenus" />
-                                    <f:selectItems value="#{mbUsuarios.listaModulosSubMenu}" />
-                                </p:selectOneMenu>
-                            </p:column>
-                        </p:row>
-                        <p:row >
-                            <p:column >
-                                <p:outputLabel for="Modulo" value="Modulo"/>
-                            </p:column>
-                            <p:column >
-                                <p:inputText style="width: 150px" id="Modulo" value="#{mbUsuarios.m.modulo}"/>
-                            </p:column>
-                        </p:row>
-                    </p:panelGrid>
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="Modulo"/>
+                        <p:inputText style="width: 150px" id="Modulo" value="#{mbUsuarios.m.modulo}"/>
+                    </h:panelGrid>
                     <p:commandButton 
                         icon="ui-icon-disk"
                         value="Guardar"
-                        action="#{mbUsuarios.guardarModulo()}" process="menu subMenu"
+                        action="#{mbUsuarios.guardarModulo()}"
                         update="growl modulos Modulo btnAcciones"
                         oncomplete="altasModulo(xhr, status, args);"
                         />

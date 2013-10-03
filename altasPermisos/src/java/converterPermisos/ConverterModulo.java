@@ -17,7 +17,7 @@ import javax.faces.convert.Converter;
  *
  * @author Comodoro
  */
-public class ConverterModulos implements Converter {
+public class ConverterModulo implements Converter {
 
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
@@ -27,7 +27,7 @@ public class ConverterModulos implements Converter {
         try {
             modulo = dao.dameModulo(idModulo);
         } catch (SQLException ex) {
-            Logger.getLogger(ConverterModulos.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ConverterModulo.class.getName()).log(Level.SEVERE, null, ex);
         }
         return modulo;
     }
