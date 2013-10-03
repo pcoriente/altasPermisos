@@ -41,7 +41,7 @@ public class DaoPer {
     public DaoPer() {
         try {
             Context cI = new InitialContext();
-            ds = (DataSource) cI.lookup("java:comp/env/jdbc/__systemWeb");
+            ds = (DataSource) cI.lookup("java:comp/env/jdbc/__webSystemMy");
         } catch (NamingException ex) {
             Logger.getLogger(DaoPer.class.getName()).log(Level.SEVERE, null, ex);
         }
