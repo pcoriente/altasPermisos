@@ -89,7 +89,7 @@ public class MbUsuarios {
                 }
             }
         }
-        pickBd = new DualListModel<>(a1, a2);
+        pickBd = new DualListModel<BaseDatos>(a1, a2);
         return pickBd;
     }
 
